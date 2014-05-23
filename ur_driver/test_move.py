@@ -8,10 +8,12 @@ from trajectory_msgs.msg import *
 
 JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
                'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-Q1 = [2.2,0,-1.57,0,0,0]
-Q2 = [1.5,0,-1.57,0,0,0]
-Q3 = [1.5,-0.2,-1.57,0,0,0]
-
+# Q1 = [2.2,0,-1.57,0,0,0]
+# Q2 = [1.5,0,-1.57,0,0,0]
+# Q3 = [1.5,-0.2,-1.57,0,0,0]
+Q1 = [0,-1.5707,0,-1.57,0,0]
+Q2 = [.707,-1.5707,.707,-1.57,0,0]
+Q3 = [.707,-1.2707,.707,-1.27,0,0]
 client = None
 
 def move1():
