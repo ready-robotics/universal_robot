@@ -14,6 +14,7 @@ import rospy
 import actionlib
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryAction
+from control_msgs.msg import PointHeadAction
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 from deserialize import RobotState, RobotMode
@@ -453,8 +454,10 @@ class UR5TrajectoryFollower(object):
         self.robot = robot
         self.server = actionlib.ActionServer("follow_joint_trajectory",
                                              FollowJointTrajectoryAction,
-                                             self.on_goal, self.on_cancel, auto_start=False)
-
+                                             self.on_goal, self.on_cancel, auto_start=True)
+        # self.server = actionlib.ActionServer("point_head_action",
+        #                                         PointHeadAction,
+        #                                         self.on_goal, self.on_cancel, auto_start=False)
         self.goal_handle = None
         self.traj = None
         self.traj_t0 = 0.0
