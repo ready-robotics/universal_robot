@@ -21,7 +21,7 @@ Remember that you should always have your hands on the big red button in case th
 
 Amanda's Updates to this Incorrect README file:
 
-Use the amedwards branch: cartesian_working
+Use the amedwards branch: ur5_robotiq_2finger
 
 If you really want to run the bringup file, this is the command you need to execute:
 
@@ -31,3 +31,5 @@ To actually use the robot with the updated files:
 /catkin_ws/src/universal_robot/ur5_moveit_config/launch$ roslaunch demo.launch
 
 This will bring up MoveIt!  Be sure to update the start state of the robot each time you plan a new motion or else the previous start state will be used for the planning.
+
+The gripper group of the robotiq gripper consists only of the fingers on the gripper instead of the entire robotiq gripper.  This makes sure that the interactive marker for the rviz planning of the end effector shows up in the right spot on the robot and not on the robot's wrist.
