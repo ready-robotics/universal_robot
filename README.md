@@ -16,3 +16,18 @@ In order to start moveit! s.t. it can directly control the robot, close ur_bring
 $ roslaunch ur5_moveit_config moveit_planning_execution.launch sim:=false robot_ip:=IP_OF_THE_ROBOT
 
 Remember that you should always have your hands on the big red button in case there is something in the way, or anything unexcpected happens.
+
+
+
+Amanda's Updates to this Incorrect README file:
+
+Use the amedwards branch: cartesian_working
+
+If you really want to run the bringup file, this is the command you need to execute:
+
+/catkin_ws/src/universal_robot/ur5_experimental$ roslaunch ur_bringup ur5_bringup.launch robot_ip:=192.168.1.155
+
+To actually use the robot with the updated files:
+/catkin_ws/src/universal_robot/ur5_moveit_config/launch$ roslaunch demo.launch
+
+This will bring up MoveIt!  Be sure to update the start state of the robot each time you plan a new motion or else the previous start state will be used for the planning.

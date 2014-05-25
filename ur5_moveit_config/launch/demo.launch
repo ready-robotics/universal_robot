@@ -16,7 +16,7 @@
 
   <!-- UR driver consists of a single node - does not currrently follow ROS-I convention -->
   <node name="ur_driver" pkg="ur_driver" type="driver.py" args="192.168.1.155" output="screen">
-<!--     <remap from="follow_joint_trajectory/" to="joint_trajectory_action/"/> -->
+    <remap from="follow_joint_trajectory/" to="joint_trajectory_action/"/>
   </node>
 
   <!-- If needed, broadcast static tf for robot root -->
