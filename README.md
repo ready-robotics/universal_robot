@@ -25,7 +25,7 @@ Use the amedwards branch: ur5_robotiq_2finger
 
 If you really want to run the bringup file, this is the command you need to execute:
 
-/catkin_ws/src/universal_robot/ur5_experimental$ roslaunch ur_bringup ur5_bringup.launch robot_ip:=192.168.1.155
+/catkin_ws/src/universal_robot$ roslaunch ur_bringup ur5_bringup.launch robot_ip:=192.168.1.155
 
 To actually use the robot with the updated files:
 /catkin_ws/src/universal_robot/ur5_moveit_config/launch$ roslaunch demo.launch
