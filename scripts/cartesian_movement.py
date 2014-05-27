@@ -13,26 +13,29 @@ from cartesian_trajectory_msgs.msg import *
 
 class CartPusher(object):
     def __init__(self):
-        self.get_cartesian_path = rospy.ServiceProxy('get_cartesian_path', GetCartesianPath)
-        rospy.wait_for_service('get_cartesian_path')
+
         rospy.Subscriber("joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
         rospy.Subscriber("dmp", cartesian_trajectory_msgs.msg.CartesianTrajectory, self.dmp_callback)
+        self.get_cartesian_path = rospy.ServiceProxy('get_cartesian_path', GetCartesianPath)
+        print "waiting for service get_cartesian_path"
+        rospy.wait_for_service('get_cartesian_path')
+        print "found service get_cartesian_path"
 
-    def joint_state_callback(msg):
+    def joint_state_callback(self,msg):
         # get a joint state message
         # store it
-        newest_joint_state = msg.data
-        rospy.loginfo(msg.data)
+        newest_joint_state = msg
+        rospy.loginfo(msg)
 
-    def dmp_callback(msg):
-        incoming_dmp_msg_pose = msg.data.points.poses
-        incoming_dmp_time_from_start = msg.data.points.time_from_start
+    def dmp_callback(self,msg):
+        incoming_dmp_msg_pose = msg.points.poses
+        incoming_dmp_time_from_start = msg.points.time_from_start
 
         cart_path_request = moveit_msgs.srv.GetCartesianPathRequest()
         cart_path_request.start_state = newest_joint_state # Copy the latest joint state into the get_cartesian_path message
         cart_path_request.group_name = manipulator # or arm if we are using the ur5_robotiq_2_fingered
         # cart_path_request.link_name = # Optional name of IK link for which waypoints are specified.  If not specified, the tip of the group (which is assumed to be a chain) is assumed to be the link  
-        cart_path_request.waypoints = msg.data.dmp.points.poses
+        cart_path_request.waypoints = msg.dmp.points.poses
         cart_path_request.max_step = 2
         cart_path_request.jump_threshold = 5
         cart_path_request.avoid_collisions = False
