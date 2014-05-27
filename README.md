@@ -33,3 +33,10 @@ To actually use the robot with the updated files:
 This will bring up MoveIt!  Be sure to update the start state of the robot each time you plan a new motion or else the previous start state will be used for the planning.
 
 The gripper group of the robotiq gripper consists only of the fingers on the gripper instead of the entire robotiq gripper.  This makes sure that the interactive marker for the rviz planning of the end effector shows up in the right spot on the robot and not on the robot's wrist.
+
+To run with the fake robot:
+roscore
+amanda@jade-shadow:~/catkin_ws/src/universal_robot/ur5_robotiq_moveit_config/launch$ roslaunch demo_fake_robot.launch 
+amanda@jade-shadow:~/catkin_ws/src/universal_robot/ur5_control/launch$ roslaunch ur5_robotiq_joint_limited_control.launch 
+amanda@jade-shadow:~/catkin_ws/src/universal_robot/scripts$ ./cartesian_movement.py 
+amanda@jade-shadow:~/catkin_ws/src/code_sprint_1/src/scripts$ ./talker.py 

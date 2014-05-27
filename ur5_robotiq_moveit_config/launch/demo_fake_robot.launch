@@ -6,11 +6,21 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
 
-  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
-  <include file="$(find ur5_robotiq_moveit_config)/launch/planning_context.launch">
-    <arg name="load_robot_description" value="true"/>
+  <!-- start gazebo with an empty plane -->
+  <!--  startup simulated world  -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
   </include>
 
+  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
+<!--   <include file="$(find ur5_robotiq_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include> -->
+
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 0.1" respawn="false" output="screen"/>
+  <include file="$(find ur_gazebo)/launch/controller_utils.launch"/>
+  <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/>
+  <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" args="arm_controller"/>
   <!-- If needed, broadcast static tf for robot root -->
 
   <!-- We do not have a robot connected, so publish fake joint states -->
@@ -20,7 +30,7 @@
   </node>
   
   <!-- Given the published joint states, publish tf for the robot links -->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+<!--   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" /> -->
 
   <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
   <include file="$(find ur5_robotiq_moveit_config)/launch/move_group.launch">
@@ -28,6 +38,7 @@
     <arg name="fake_execution" value="true"/>
     <arg name="info" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
+    <arg name="load_robot_description" value="true"/>
   </include>
 
   <!-- Run Rviz and load the default config to see the state of the move_group node -->
@@ -39,8 +50,8 @@
   <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
   <param name="moveit_controller_manager" value="moveit_fake_controller_manager/MoveItFakeControllerManager"/>
 
-  <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/>
-  <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" args="arm_controller_ur5" />
+<!--   <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml" command="load"/>
+  <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller" /> -->
 
   <!-- The rest of the params are specific to this plugin -->
   <rosparam file="$(find ur5_robotiq_moveit_config)/config/fake_controllers.yaml"/>

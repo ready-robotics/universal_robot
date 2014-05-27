@@ -8,6 +8,8 @@ import rospy
 from control_msgs.msg import *
 from moveit_msgs.srv import *
 from trajectory_msgs.msg import *
+from sensor_msgs.msg import *
+from cartesian_trajectory_msgs.msg import *
 
 class CartPusher(object):
     def __init__(self):
@@ -78,7 +80,7 @@ if __name__ == "__main__":
     global client
     try:
         rospy.init_node('cartesian_movement_listener', anonymous=True)
-        client = actionlib.SimpleActionClient('follow_joint_trajectory', FollowJointTrajectoryAction)
+        client = actionlib.SimpleActionClient('arm_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
         print "Waiting for server..."
         client.wait_for_server()
         print "Connected to server"
