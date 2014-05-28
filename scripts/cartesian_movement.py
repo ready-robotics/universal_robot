@@ -7,6 +7,7 @@ import rospy
 # from GetCartesianPath.srv import *
 from control_msgs.msg import *
 from moveit_msgs.srv import *
+from moveit_msgs.msg import *
 from trajectory_msgs.msg import *
 from sensor_msgs.msg import *
 from cartesian_trajectory_msgs.msg import *
@@ -25,7 +26,13 @@ class CartPusher(object):
     def joint_state_callback(self,msg):
         # get a joint state message
         # store it
-        self.newest_joint_state = msg
+        my_object = RobotState()
+        my_object.joint_state = JointState()
+        my_object.joint_state.name = msg.name
+        my_object.joint_state.position = msg.position
+        my_object.joint_state.velocity = msg.velocity
+        my_object.joint_state.effort = msg.effort
+        self.newest_joint_state = my_object
         # rospy.loginfo(msg)
 
     def dmp_callback(self,msg):
@@ -37,9 +44,9 @@ class CartPusher(object):
         cart_path_request.start_state = self.newest_joint_state # Copy the latest joint state into the get_cartesian_path message
         cart_path_request.group_name = "arm" # or arm if we are using the ur5_robotiq_2_fingered
         # cart_path_request.link_name = # Optional name of IK link for which waypoints are specified.  If not specified, the tip of the group (which is assumed to be a chain) is assumed to be the link  
-        cart_path_request.waypoints = msg.points[0].poses[0]
-        cart_path_request.max_step = 2
-        cart_path_request.jump_threshold = 5
+        cart_path_request.waypoints = [incoming_dmp_msg_pose]
+        cart_path_request.max_step = 0.01
+        cart_path_request.jump_threshold = 0.01
         cart_path_request.avoid_collisions = False
         # cart_path_request.path_constraints = # Specify additional constraints to be met by the Cartesian path
 
@@ -50,10 +57,12 @@ class CartPusher(object):
             # output from get_cartesian_path:
             output_joint_state = resp.start_state.joint_state  # The state at which the computed path starts
             output_attached_collision_objects = resp.start_state.attached_collision_objects
-            output_is_diff = resp.is_diff
-            output_joint_trajectory_positions = resp.solution.joint_trajectory.points.positions # The computed solution trajectory, for the desired group, in configuration space
-            output_joint_trajectory_velocities = resp.solution.joint_trajectory.points.velocities
-            output_joint_trajectory_duration = resp.solution.joint_trajectory.points.time_from_start
+            # output_is_diff = resp.is_diff
+            #print resp.solution.joint_trajectory.points
+            output_joint_trajectory_points = resp.solution.joint_trajectory.points
+            # output_joint_trajectory_positions = resp.solution.joint_trajectory.points.positions # The computed solution trajectory, for the desired group, in configuration space
+            # output_joint_trajectory_velocities = resp.solution.joint_trajectory.points.velocities
+            # output_joint_trajectory_duration = resp.solution.joint_trajectory.points.time_from_start
             output_fraction = resp.fraction # If the computation was incomplete, this value indicates the fraction of the path that was in fact computed (nr of waypoints traveled through)
             output_error_code = resp.error_code # The error code of the computation
 
@@ -67,10 +76,12 @@ class CartPusher(object):
             g = FollowJointTrajectoryGoal()
             g.trajectory = JointTrajectory()
             g.trajectory.joint_names = JOINT_NAMES
-            g.trajectory.points = [ JointTrajectoryPoint(
-                positions=output_joint_trajectory_positions, 
-                velocities=output_joint_trajectory_velocities, 
-                time_from_start=output_joint_trajectory_duration)]
+            # g.trajectory.points = [ JointTrajectoryPoint(
+            #     positions=output_joint_trajectory_positions, 
+            #     velocities=output_joint_trajectory_velocities, 
+            #     time_from_start=output_joint_trajectory_duration)]
+            g.trajectory.points = output_joint_trajectory_points
+            print g.trajectory.points
             client.send_goal(g)
             try:
                 client.wait_for_result()
