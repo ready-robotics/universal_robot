@@ -37,6 +37,5 @@ The gripper group of the robotiq gripper consists only of the fingers on the gri
 To run with the fake robot:
 roscore
 amanda@jade-shadow:~/catkin_ws/src/universal_robot/ur5_robotiq_moveit_config/launch$ roslaunch demo_fake_robot.launch 
-amanda@jade-shadow:~/catkin_ws/src/universal_robot/ur5_control/launch$ roslaunch ur5_robotiq_joint_limited_control.launch 
 amanda@jade-shadow:~/catkin_ws/src/universal_robot/scripts$ ./cartesian_movement.py 
 amanda@jade-shadow:~/catkin_ws/src/code_sprint_1/src/scripts$ ./talker.py 

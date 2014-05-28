@@ -16,26 +16,27 @@ class CartPusher(object):
 
         rospy.Subscriber("joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
         rospy.Subscriber("dmp", cartesian_trajectory_msgs.msg.CartesianTrajectory, self.dmp_callback)
-        self.get_cartesian_path = rospy.ServiceProxy('get_cartesian_path', GetCartesianPath)
         print "waiting for service get_cartesian_path"
         rospy.wait_for_service('get_cartesian_path')
+        self.get_cartesian_path = rospy.ServiceProxy('get_cartesian_path', GetCartesianPath)
         print "found service get_cartesian_path"
 
     def joint_state_callback(self,msg):
         # get a joint state message
         # store it
-        newest_joint_state = msg
+        self.newest_joint_state = msg
         rospy.loginfo(msg)
 
     def dmp_callback(self,msg):
-        incoming_dmp_msg_pose = msg.points.poses
-        incoming_dmp_time_from_start = msg.points.time_from_start
+        global client
+        incoming_dmp_msg_pose = msg.points[0].poses[0]
+        incoming_dmp_time_from_start = msg.points[0].time_from_start
 
         cart_path_request = moveit_msgs.srv.GetCartesianPathRequest()
-        cart_path_request.start_state = newest_joint_state # Copy the latest joint state into the get_cartesian_path message
-        cart_path_request.group_name = manipulator # or arm if we are using the ur5_robotiq_2_fingered
+        cart_path_request.start_state = self.newest_joint_state # Copy the latest joint state into the get_cartesian_path message
+        cart_path_request.group_name = "arm" # or arm if we are using the ur5_robotiq_2_fingered
         # cart_path_request.link_name = # Optional name of IK link for which waypoints are specified.  If not specified, the tip of the group (which is assumed to be a chain) is assumed to be the link  
-        cart_path_request.waypoints = msg.dmp.points.poses
+        cart_path_request.waypoints = msg.points[0].poses[0]
         cart_path_request.max_step = 2
         cart_path_request.jump_threshold = 5
         cart_path_request.avoid_collisions = False
@@ -44,42 +45,42 @@ class CartPusher(object):
         # Pass the dmp to get_cartesian_path
         try:
             resp = self.get_cartesian_path(cart_path_request) # I want to stuff get_cartesian_path into JointTrajectoryAction
+
+            # output from get_cartesian_path:
+            output_joint_state = resp.start_state.joint_state  # The state at which the computed path starts
+            output_attached_collision_objects = resp.start_state.attached_collision_objects
+            output_is_diff = resp.is_diff
+            output_joint_trajectory_positions = resp.solution.joint_trajectory.points.positions # The computed solution trajectory, for the desired group, in configuration space
+            output_joint_trajectory_velocities = resp.solution.joint_trajectory.points.velocities
+            output_joint_trajectory_duration = resp.solution.joint_trajectory.points.time_from_start
+            output_fraction = resp.fraction # If the computation was incomplete, this value indicates the fraction of the path that was in fact computed (nr of waypoints traveled through)
+            output_error_code = resp.error_code # The error code of the computation
+
+            # The following code
+            # 1. Reads joint trajectory out of resp and puts it into a follow joint trajectory action
+            # 2. Then it calls the follow joint trajectory action
+
+            JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+
+            g = FollowJointTrajectoryGoal()
+            g.trajectory = JointTrajectory()
+            g.trajectory.joint_names = JOINT_NAMES
+            g.trajectory.points = [ JointTrajectoryPoint(
+                positions=output_joint_trajectory_positions, 
+                velocities=output_joint_trajectory_velocities, 
+                time_from_start=output_joint_trajectory_duration)]
+            client.send_goal(g)
+            try:
+                client.wait_for_result()
+            except KeyboardInterrupt:
+                client.cancel_goal()
+                raise
+
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
 
-        # output from get_cartesian_path:
-        output_joint_state = resp.start_state.joint_state  # The state at which the computed path starts
-        output_attached_collision_objects = resp.start_state.attached_collision_objects
-        output_is_diff = resp.is_diff
-        output_joint_trajectory_positions = resp.solution.joint_trajectory.points.positions # The computed solution trajectory, for the desired group, in configuration space
-        output_joint_trajectory_velocities = resp.solution.joint_trajectory.points.velocities
-        output_joint_trajectory_duration = resp.solution.joint_trajectory.points.time_from_start
-        output_fraction = resp.fraction # If the computation was incomplete, this value indicates the fraction of the path that was in fact computed (nr of waypoints traveled through)
-        output_error_code = resp.error_code # The error code of the computation
-
-        # The following code
-        # 1. Reads joint trajectory out of resp and puts it into a follow joint trajectory action
-        # 2. Then it calls the follow joint trajectory action
-
-        JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-               'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-
-        g = FollowJointTrajectoryGoal()
-        g.trajectory = JointTrajectory()
-        g.trajectory.joint_names = JOINT_NAMES
-        g.trajectory.points = [ JointTrajectoryPoint(
-            positions=output_joint_trajectory_positions, 
-            velocities=output_joint_trajectory_velocities, 
-            time_from_start=output_joint_trajectory_duration)]
-        client.send_goal(g)
-        try:
-            client.wait_for_result()
-        except KeyboardInterrupt:
-            client.cancel_goal()
-            raise
-
 if __name__ == "__main__":
-    global newest_joint_state
     global client
     try:
         rospy.init_node('cartesian_movement_listener', anonymous=True)
