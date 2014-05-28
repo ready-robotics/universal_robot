@@ -10,22 +10,23 @@ from moveit_msgs.srv import *
 from trajectory_msgs.msg import *
 from sensor_msgs.msg import *
 from cartesian_trajectory_msgs.msg import *
+from moveit_commander import MoveGroupCommander
 
 class CartPusher(object):
     def __init__(self):
 
         rospy.Subscriber("joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
         rospy.Subscriber("dmp", cartesian_trajectory_msgs.msg.CartesianTrajectory, self.dmp_callback)
-        print "waiting for service get_cartesian_path"
-        rospy.wait_for_service('get_cartesian_path')
-        self.get_cartesian_path = rospy.ServiceProxy('get_cartesian_path', GetCartesianPath)
-        print "found service get_cartesian_path"
+        print "waiting for service compute_cartesian_path"
+        rospy.wait_for_service('compute_cartesian_path')
+        self.get_cartesian_path = rospy.ServiceProxy('compute_cartesian_path', GetCartesianPath)
+        print "found service compute_cartesian_path"
 
     def joint_state_callback(self,msg):
         # get a joint state message
         # store it
         self.newest_joint_state = msg
-        rospy.loginfo(msg)
+        # rospy.loginfo(msg)
 
     def dmp_callback(self,msg):
         global client
