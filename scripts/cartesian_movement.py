@@ -37,14 +37,15 @@ class CartPusher(object):
 
     def dmp_callback(self,msg):
         global client
-        incoming_dmp_msg_pose = msg.points[0].poses[0]
-        incoming_dmp_time_from_start = msg.points[0].time_from_start
+        # [point.poses[0] for point in msg.points]
+        # incoming_dmp_msg_pose = msg.points[].poses[0]
+        # incoming_dmp_time_from_start = msg.points[0].time_from_start
 
         cart_path_request = moveit_msgs.srv.GetCartesianPathRequest()
         cart_path_request.start_state = self.newest_joint_state # Copy the latest joint state into the get_cartesian_path message
         cart_path_request.group_name = "arm" # or arm if we are using the ur5_robotiq_2_fingered
         # cart_path_request.link_name = # Optional name of IK link for which waypoints are specified.  If not specified, the tip of the group (which is assumed to be a chain) is assumed to be the link  
-        cart_path_request.waypoints = [incoming_dmp_msg_pose]
+        cart_path_request.waypoints = [point.poses[0] for point in msg.points]
         cart_path_request.max_step = 0.01
         cart_path_request.jump_threshold = 0.01
         cart_path_request.avoid_collisions = False
@@ -53,7 +54,7 @@ class CartPusher(object):
         # Pass the dmp to get_cartesian_path
         try:
             resp = self.get_cartesian_path(cart_path_request) # I want to stuff get_cartesian_path into JointTrajectoryAction
-
+            print resp
             # output from get_cartesian_path:
             output_joint_state = resp.start_state.joint_state  # The state at which the computed path starts
             output_attached_collision_objects = resp.start_state.attached_collision_objects
@@ -81,7 +82,7 @@ class CartPusher(object):
             #     velocities=output_joint_trajectory_velocities, 
             #     time_from_start=output_joint_trajectory_duration)]
             g.trajectory.points = output_joint_trajectory_points
-            print g.trajectory.points
+
             client.send_goal(g)
             try:
                 client.wait_for_result()
