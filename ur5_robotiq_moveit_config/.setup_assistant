@@ -1,7 +1,7 @@
 moveit_setup_assistant_config:
   URDF:
-    package: ""
-    relative_path: /home/kel/catkin_ws/src/universal_robot/ur5_robotiq_description/urdf/ur5_robotiq_joint_limited.urdf
+    package: ur5_robotiq_description
+    relative_path: src/urdf/ur5_robotiq_joint_limited.urdf
   SRDF:
     relative_path: config/ur5.srdf
   CONFIG:

@@ -17,6 +17,8 @@
       <chargeRate>525</chargeRate>
       <dischargeVoltage>15.52</dischargeVoltage>
       <chargeVoltage>16.41</chargeVoltage>
+      <selfCollide>true</selfCollide>
+      <gravity>true</gravity>
     </plugin>
   </gazebo>
   <!-- ur5 -->
@@ -26,6 +28,12 @@
   <material name="UR/Grey">
     <color rgba="0.7 0.7 0.7 1.0"/>
   </material>
+  <link name="world" />
+  <joint name= "world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+  </joint>
   <!-- arm -->
   <link name="base_link">
     <visual>
@@ -242,6 +250,12 @@
       </material>
       <origin rpy="1.5707 0 1.5707" xyz="0 0 0"/>
     </visual>
+    <collision>
+      <geometry>
+        <box size="0.064 0.064 0.012"/>
+      </geometry>
+      <origin rpy="1.5707 0 1.5707" xyz="0 0 0"/>
+    </collision>
   </link>
 
   <!--  /\  -->
@@ -265,6 +279,12 @@
       </geometry>
       <origin rpy="3.1415 0 1.5707" xyz="0 0 0"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_base.dae"/>
+      </geometry>
+      <origin rpy="3.1415 0 1.5707" xyz="0 0 0"/>      
+    </collision>
   </link>
 
   <!--  /\  -->
@@ -300,6 +320,12 @@
       </geometry>
       <origin rpy="3.14159 -1.5707 0" xyz="0 .04191 -.0306"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_0_L.dae"/>
+      </geometry>
+      <origin rpy="3.14159 -1.5707 0" xyz="0 .04191 -.0306"/>
+    </collision>
   </link> 
 
   <link name="robotiq_85_right_knuckle_link">
@@ -314,6 +340,12 @@
       </geometry>
       <origin rpy="3.14159 1.5707 0" xyz="0 .04191 -.0306"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_0_R.dae"/>
+      </geometry>
+      <origin rpy="3.14159 1.5707 0" xyz="0 .04191 -.0306"/>
+    </collision>
   </link>
 
   <!--  /\  -->
@@ -348,6 +380,12 @@
       </geometry>
       <origin rpy="0 1.5707 0" xyz="0 -.03683 .06194"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_1_L.dae"/>
+      </geometry>
+      <origin rpy="0 1.5707 0" xyz="0 -.03683 .06194"/>
+    </collision>
   </link> 
 
   <link name="robotiq_85_right_finger_link">
@@ -362,6 +400,12 @@
       </geometry>
       <origin rpy="0 -1.5707 0" xyz="0 -.03683 .06194"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_1_R.dae"/>
+      </geometry>
+      <origin rpy="0 -1.5707 0" xyz="0 -.03683 .06194"/>
+    </collision>
   </link> 
 
   <!--  /\  -->
@@ -398,6 +442,12 @@
       </geometry>
       <origin rpy="0 1.5707 0" xyz="0 -.04843 .0127"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_2_L.dae"/>
+      </geometry>
+      <origin rpy="0 1.5707 0" xyz="0 -.04843 .0127"/>
+    </collision>
   </link>
 
   <link name="robotiq_85_right_inner_knuckle_link">
@@ -412,6 +462,12 @@
       </geometry>
       <origin rpy="0 -1.5707 0" xyz="0 -.04843 .0127"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_2_R.dae"/>
+      </geometry>
+      <origin rpy="0 -1.5707 0" xyz="0 -.04843 .0127"/>
+    </collision>
   </link>
 
   <!--  /\  -->
@@ -448,6 +504,12 @@
       </geometry>
       <origin rpy="0 1.5707 0" xyz="0 -.090381 .051505"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_3_L.dae"/>
+      </geometry>
+      <origin rpy="0 1.5707 0" xyz="0 -.090381 .051505"/>
+    </collision>
   </link> 
 
   <link name="robotiq_85_right_finger_tip_link">
@@ -462,6 +524,12 @@
       </geometry>
       <origin rpy="0 -1.5707 0" xyz="0 -.090381 .051505"/>
     </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_3_R.dae"/>
+      </geometry>
+      <origin rpy="0 -1.5707 0" xyz="0 -.090381 .051505"/>
+    </collision>
   </link>
 
 
