@@ -12,36 +12,21 @@
     <arg name="world_name" default="worlds/empty.world"/>
   </include>
 
+    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 0.0" respawn="false" output="screen"/>
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
-<!--   <include file="$(find ur5_robotiq_moveit_config)/launch/planning_context.launch">
+  <include file="$(find ur5_robotiq_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="true"/>
-  </include> -->
+  </include>
 
-  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 0.0" respawn="false" output="screen"/>
   <include file="$(find ur_gazebo)/launch/controller_utils.launch"/>
 
     <!-- Load joint controller configurations from YAML filoe to parameter server -->
   <rosparam file="$(find ur5_robotiq_control)/config/ur5_robotiq_control.yaml" command="load"/>
-<!--   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/> -->
-  <node name="arm_controller_spawner" pkg="controller_manager" ns="ur5_robotiq_joint_limited" type="spawner" respawn="false" output="screen" args="joint_state_controller shoulder_pan_joint_controller  shoulder_lift_joint_controller elbow_joint_controller wrist_1_joint_controller wrist_2_joint_controller wrist_3_joint_controller" />
-
-  <!-- If needed, broadcast static tf for robot root -->
-
-  <!-- We do not have a robot connected, so publish fake joint states -->
-<!--   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="/use_gui" value="false"/> 
-    <rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
-  </node> -->
-  
-  <!-- Given the published joint states, publish tf for the robot links -->
+  <!--   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/> -->
+  <node name="arm_controller_spawner" pkg="controller_manager" ns="ur5_robotiq_joint_limited" type="spawner" respawn="false" output="screen" args="joint_trajectory_controller" />
 
   <group ns="ur5_robotiq_joint_limited" >
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true">
-    </node>
-
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    </node>
 
     <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
     <include file="$(find ur5_robotiq_moveit_config)/launch/move_group.launch">
@@ -49,7 +34,7 @@
       <arg name="fake_execution" value="true"/>
       <arg name="info" value="true"/>
       <arg name="debug" value="$(arg debug)"/>
-      <arg name="load_robot_description" value="true"/>
+      <arg name="load_robot_description" value="false"/>
     </include>
 
 
@@ -62,11 +47,12 @@
     <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
     <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
 
-    <!--   <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml" command="load"/>
-    <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller" /> -->
+    <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml" command="load"/>
+    <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller" />
 
     <!-- The rest of the params are specific to this plugin -->
-    <!--   <rosparam file="$(find ur5_robotiq_moveit_config)/config/fake_controllers.yaml"/> -->
+    <rosparam file="$(find ur5_robotiq_moveit_config)/config/fake_controllers.yaml"/>
+    
 
     <!-- If database loading was enabled, start mongodb as well -->
     <include file="$(find ur5_robotiq_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)"/>
