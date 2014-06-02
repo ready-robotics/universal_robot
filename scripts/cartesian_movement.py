@@ -44,7 +44,7 @@ class CartPusher(object):
         cart_path_request = moveit_msgs.srv.GetCartesianPathRequest()
         cart_path_request.start_state = self.newest_joint_state # Copy the latest joint state into the get_cartesian_path message
         cart_path_request.group_name = "arm" # or arm if we are using the ur5_robotiq_2_fingered
-        cart_path_request.link_name = "robotiq_85_base_link"# Optional name of IK link for which waypoints are specified.  If not specified, the tip of the group (which is assumed to be a chain) is assumed to be the link  
+        cart_path_request.link_name = "wrist_3_link"# Optional name of IK link for which waypoints are specified.  If not specified, the tip of the group (which is assumed to be a chain) is assumed to be the link  
         cart_path_request.waypoints = [point.poses[0] for point in msg.points]
         cart_path_request.max_step = 0.1
         cart_path_request.jump_threshold = 0
@@ -72,7 +72,7 @@ class CartPusher(object):
             # 2. Then it calls the follow joint trajectory action
 
             JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint', 'ee_fixed_joint' 'robotiq_85_base_joint']
 
             g = FollowJointTrajectoryGoal()
             g.trajectory = JointTrajectory()
