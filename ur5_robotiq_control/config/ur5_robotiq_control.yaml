@@ -1,96 +1,37 @@
-ur5_robotiq_joint_limited:
+arm_trajectory_controller:
+  type: "position_controllers/JointTrajectoryController"
+  #joints: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
+  #publish_rate: 50
+  joints:
+    - shoulder_pan_joint
+    - shoulder_lift_joint
+    - elbow_joint
+    - wrist_1_joint
+    - wrist_2_joint
+    - wrist_3_joint
+  constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.5
+      shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      elbow_joint: {trajectory: 0.1, goal: 0.1}
+      shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+  stop_trajectory_duration: 0.5
+  state_publish_rate:  25
+  action_monitor_rate: 10
 
-  #Publish all joint states
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 50
-    
-  joint_trajectory_controller:
-    type: "position_controllers/JointTrajectoryController"
-    #joints: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
-    #publish_rate: 50
-    joints:
-      - shoulder_pan_joint
-      - shoulder_lift_joint
-      - elbow_joint
-      - wrist_1_joint
-      - wrist_2_joint
-      - wrist_3_joint
-      - ee_fixed_joint
-      - robotiq_85_base_joint
-      - robotiq_85_left_knuckle_joint
-      - robotiq_85_right_knuckle_joint
-      - robotiq_85_left_finger_joint
-      - robotiq_85_right_finger_joint
-      - robotiq_85_left_inner_knuckle_joint
-      - robotiq_85_right_inner_knuckle_joint
-      - robotiq_85_left_finger_tip_joint
-      - robotiq_85_right_finger_tip_joint
+hand_trajectory_controller:
+  type: "effort_controllers/JointTrajectoryController"
+  joints:
+    - robotiq_85_base_joint
+    - robotiq_85_left_knuckle_joint
+    - robotiq_85_right_knuckle_joint
+    - robotiq_85_left_finger_joint
+    - robotiq_85_right_finger_joint
+    - robotiq_85_left_inner_knuckle_joint
+    - robotiq_85_right_inner_knuckle_joint
+    - robotiq_85_left_finger_tip_joint
+    - robotiq_85_right_finger_tip_joint
 
-
-
-  #Position Controllers
-  shoulder_pan_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: shoulder_pan_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  shoulder_lift_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: shoulder_lift_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  elbow_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: elbow_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  wrist_1_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: wrist_1_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  wrist_2_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: wrist_2_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  wrist_3_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: wrist_3_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  ee_fixed_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: ee_fixed_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_base_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_base_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_left_knuckle_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_left_knuckle_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_right_knuckle_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_right_knuckle_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_left_finger_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_left_finger_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_right_finger_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_right_finger_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_left_inner_knuckle_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_left_inner_knuckle_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_right_inner_knuckle_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_right_inner_knuckle_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_left_finger_tip_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_left_finger_tip_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}
-  robotiq_85_right_finger_joint_controller:
-    type: effort_controllers/JointPositionController
-    joint: robotiq_85_right_finger_tip_joint
-    pid: {p: 1000.0, i: 0.01, d: 10.0}

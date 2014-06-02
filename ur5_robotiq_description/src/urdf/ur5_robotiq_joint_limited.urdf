@@ -33,7 +33,7 @@
   <joint name= "world_joint" type="fixed">
     <parent link="world"/>
     <child link="base_link"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 1.0"/>
   </joint>
   <!-- arm -->
   <link name="base_link">
@@ -212,336 +212,20 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
+
   <joint name="ee_fixed_joint" type="fixed">
     <parent link="wrist_3_link"/>
-    <child link="robotiq_85_adapter_link"/>
+    <child link="ee_fixed_link"/>
     <origin rpy="0.0 0.0 1.570796325" xyz="0.0 0.0823 0.0"/>
   </joint>
-  <!-- <link name="ee_link"/> -->
-
-
-
-
-
-
-
-  <link name="robotiq_85_adapter_link">
-<!--     <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_adapter_plate.dae"/>
-      </geometry>
-      <origin rpy="1.5707 0 1.5707" xyz="0 0 0"/>
-    </visual> -->
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <box size="0.064 0.064 0.012"/>
-      </geometry>
-      <material name="silver">
-        <color rgba="0.7529 0.7529 0.7529 1"/>
-      </material>
-      <origin rpy="1.5707 0 1.5707" xyz="0 0 0"/>
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.064 0.064 0.012"/>
-      </geometry>
-      <origin rpy="1.5707 0 1.5707" xyz="0 0 0"/>
-    </collision>
-  </link>
-
-  <!--  /\  -->
-  <joint name="robotiq_85_base_joint" type="fixed">
-    <parent link="robotiq_85_adapter_link"/>
-    <child link="robotiq_85_base_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="0 0 0" xyz=".0085 0 -.0041"/>
-  </joint>
-  <!--  \/  -->
-
-  <link name="robotiq_85_base_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_base.dae"/>
-      </geometry>
-      <origin rpy="3.1415 0 1.5707" xyz="0 0 0"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_base.dae"/>
-      </geometry>
-      <origin rpy="3.1415 0 1.5707" xyz="0 0 0"/>      
-    </collision>
-  </link>
-
-  <!--  /\  -->
-  <!--  /\  -->
-  <joint name="robotiq_85_left_knuckle_joint" type="revolute">
-    <parent link="robotiq_85_base_link"/>
-    <child link="robotiq_85_left_knuckle_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="-1.5707 1.5707 0" xyz=".04191 .0306 0"/>
-    <limit lower="0" upper=".8575" velocity="2.0" effort="1000"/>
-  </joint>
-
-  <joint name="robotiq_85_right_knuckle_joint" type="revolute">
-    <parent link="robotiq_85_base_link"/>
-    <child link="robotiq_85_right_knuckle_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="1.5707 -1.5707 0" xyz=".04191 -.0306 0"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-    <mimic joint="robotiq_85_left_knuckle_joint" multiplier="1"/>
-  </joint>
-  <!--  \/  -->
-  <!--  \/  -->
-
-  <link name="robotiq_85_left_knuckle_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_0_L.dae"/>
-      </geometry>
-      <origin rpy="3.14159 -1.5707 0" xyz="0 .04191 -.0306"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_0_L.dae"/>
-      </geometry>
-      <origin rpy="3.14159 -1.5707 0" xyz="0 .04191 -.0306"/>
-    </collision>
-  </link> 
-
-  <link name="robotiq_85_right_knuckle_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_0_R.dae"/>
-      </geometry>
-      <origin rpy="3.14159 1.5707 0" xyz="0 .04191 -.0306"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_0_R.dae"/>
-      </geometry>
-      <origin rpy="3.14159 1.5707 0" xyz="0 .04191 -.0306"/>
-    </collision>
-  </link>
-
-  <!--  /\  -->
-  <!--  /\  -->
-  <joint name="robotiq_85_left_finger_joint" type="fixed">
-    <parent link="robotiq_85_left_knuckle_link"/>
-    <child link="robotiq_85_left_finger_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="3.1415 0 0" xyz="0 .00508 .03134"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-  </joint>
-
-  <joint name="robotiq_85_right_finger_joint" type="fixed">
-    <parent link="robotiq_85_right_knuckle_link"/>
-    <child link="robotiq_85_right_finger_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="3.1415 0 0" xyz="0 .00508 .03134"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-  </joint>
-  <!--  \/  --> 
-  <!--  \/  -->  
-
-  <link name="robotiq_85_left_finger_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_1_L.dae"/>
-      </geometry>
-      <origin rpy="0 1.5707 0" xyz="0 -.03683 .06194"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_1_L.dae"/>
-      </geometry>
-      <origin rpy="0 1.5707 0" xyz="0 -.03683 .06194"/>
-    </collision>
-  </link> 
-
-  <link name="robotiq_85_right_finger_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_1_R.dae"/>
-      </geometry>
-      <origin rpy="0 -1.5707 0" xyz="0 -.03683 .06194"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_1_R.dae"/>
-      </geometry>
-      <origin rpy="0 -1.5707 0" xyz="0 -.03683 .06194"/>
-    </collision>
-  </link> 
-
-  <!--  /\  -->
-  <!--  /\  -->
-  <joint name="robotiq_85_left_inner_knuckle_joint" type="revolute">
-    <parent link="robotiq_85_base_link"/>
-    <child link="robotiq_85_left_inner_knuckle_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="1.5707 1.5707 0" xyz=".04843 .0127 0"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-    <mimic joint="robotiq_85_left_knuckle_joint" offset="0"/>
-  </joint> 
-
-  <joint name="robotiq_85_right_inner_knuckle_joint" type="revolute">
-    <parent link="robotiq_85_base_link"/>
-    <child link="robotiq_85_right_inner_knuckle_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="-1.5707 -1.5707 0" xyz=".04843 -.0127 0"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-    <mimic joint="robotiq_85_left_knuckle_joint" offset="0"/>
-  </joint>
-  <!--  \/  --> 
-  <!--  \/  -->  
-
-  <link name="robotiq_85_left_inner_knuckle_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_2_L.dae"/>
-      </geometry>
-      <origin rpy="0 1.5707 0" xyz="0 -.04843 .0127"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_2_L.dae"/>
-      </geometry>
-      <origin rpy="0 1.5707 0" xyz="0 -.04843 .0127"/>
-    </collision>
-  </link>
-
-  <link name="robotiq_85_right_inner_knuckle_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_2_R.dae"/>
-      </geometry>
-      <origin rpy="0 -1.5707 0" xyz="0 -.04843 .0127"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_2_R.dae"/>
-      </geometry>
-      <origin rpy="0 -1.5707 0" xyz="0 -.04843 .0127"/>
-    </collision>
-  </link>
-
-  <!--  /\  -->
-  <!--  /\  -->
-  <joint name="robotiq_85_left_finger_tip_joint" type="revolute">
-    <parent link="robotiq_85_left_inner_knuckle_link"/>
-    <child link="robotiq_85_left_finger_tip_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="0 0 0" xyz="0 .04196 -.0388"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-    <mimic joint="robotiq_85_left_knuckle_joint" multiplier="-1"/>
-  </joint>
-
-  <joint name="robotiq_85_right_finger_tip_joint" type="revolute">
-    <parent link="robotiq_85_right_inner_knuckle_link"/>
-    <child link="robotiq_85_right_finger_tip_link"/>
-    <axis xyz="1 0 0"/>
-    <origin rpy="0 0 0" xyz="0 .04196 -.0388"/>
-    <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-    <mimic joint="robotiq_85_left_knuckle_joint" multiplier="-1"/>
-  </joint>
-  <!--  \/  --> 
-  <!--  \/  -->  
-
-  <link name="robotiq_85_left_finger_tip_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_3_L.dae"/>
-      </geometry>
-      <origin rpy="0 1.5707 0" xyz="0 -.090381 .051505"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_3_L.dae"/>
-      </geometry>
-      <origin rpy="0 1.5707 0" xyz="0 -.090381 .051505"/>
-    </collision>
-  </link> 
-
-  <link name="robotiq_85_right_finger_tip_link">
-    <inertial>
-      <mass value="10"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_3_R.dae"/>
-      </geometry>
-      <origin rpy="0 -1.5707 0" xyz="0 -.090381 .051505"/>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://robotiq_c_model_visualization/meshes/robotiq_85_gripper_joint_3_R.dae"/>
-      </geometry>
-      <origin rpy="0 -1.5707 0" xyz="0 -.090381 .051505"/>
-    </collision>
-  </link>
-
-
-
+  <link name="ee_fixed_link"/>
 
 
   <transmission name="shoulder_pan_trans">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="shoulder_pan_joint"/>
     <actuator name="shoulder_pan_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -549,7 +233,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="shoulder_lift_joint"/>
     <actuator name="shoulder_lift_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -557,7 +241,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="elbow_joint"/>
     <actuator name="elbow_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -565,7 +249,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="wrist_1_joint"/>
     <actuator name="wrist_1_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -573,7 +257,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="wrist_2_joint"/>
     <actuator name="wrist_2_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -581,7 +265,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="wrist_3_joint"/>
     <actuator name="wrist_3_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -590,7 +274,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_left_knuckle_joint"/>
     <actuator name="robotiq_85_left_knuckle_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -599,7 +283,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_right_knuckle_joint"/>
     <actuator name="robotiq_85_right_knuckle_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -608,7 +292,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_left_finger_joint"/>
     <actuator name="robotiq_85_left_finger_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -617,7 +301,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_right_finger_joint"/>
     <actuator name="robotiq_85_right_finger_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -626,7 +310,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_left_inner_knuckle_joint"/>
     <actuator name="robotiq_85_left_inner_knuckle_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -635,7 +319,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_right_inner_knuckle_joint"/>
     <actuator name="robotiq_85_right_inner_knuckle_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -644,7 +328,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_left_finger_tip_joint"/>
     <actuator name="robotiq_85_left_finger_tip_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
@@ -653,7 +337,7 @@
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="robotiq_85_right_finger_tip_joint"/>
     <actuator name="robotiq_85_right_finger_tip_motor">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission> -->

@@ -61,57 +61,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          ee_fixed_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           forearm_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_adapter_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_knuckle_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -171,7 +125,7 @@ Visualization Manager:
         Show Workspace: false
         Start State Alpha: 1
         Start State Color: 0; 255; 0
-      Planning Scene Topic: /ur5_robotiq_joint_limited/move_group/monitored_planning_scene
+      Planning Scene Topic: /move_group/monitored_planning_scene
       Robot Description: robot_description
       Scene Geometry:
         Scene Alpha: 1
@@ -193,57 +147,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          ee_fixed_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           forearm_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_adapter_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_left_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          robotiq_85_right_knuckle_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -296,22 +204,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 3.86665
+      Distance: 2.52281
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.390468
-        Y: 0.0461022
+        X: 0.138677
+        Y: 0.323647
         Z: 1.04309e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: -0.0402028
+      Pitch: 0.289798
       Target Frame: base_link
       Value: XYOrbit (rviz)
-      Yaw: 0.716793
+      Yaw: 0.686793
     Saved: ~
 Window Geometry:
   Displays:

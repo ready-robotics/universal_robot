@@ -7,7 +7,6 @@
   <arg name="debug" default="false" />
 
   <!-- start gazebo with an empty plane -->
-  <!--  startup simulated world  -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" default="worlds/empty.world"/>
   </include>
@@ -20,21 +19,38 @@
 
   <include file="$(find ur_gazebo)/launch/controller_utils.launch"/>
 
-    <!-- Load joint controller configurations from YAML filoe to parameter server -->
-  <rosparam file="$(find ur5_robotiq_control)/config/ur5_robotiq_control.yaml" command="load"/>
-  <!--   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/> -->
-  <node name="arm_controller_spawner" pkg="controller_manager" ns="ur5_robotiq_joint_limited" type="spawner" respawn="false" output="screen" args="joint_trajectory_controller" />
 
   <group ns="ur5_robotiq_joint_limited" >
 
+    <!-- Load joint controller configurations from YAML filoe to parameter server -->
+    <rosparam file="$(find ur5_robotiq_control)/config/ur5_robotiq_control.yaml" command="load"/>
+
+    <!--   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/> -->
+    <node name="arm_controller_spawner" pkg="controller_manager"
+      type="spawner" respawn="true" output="screen" args="arm_trajectory_controller" />
+
+    <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
+
+    <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml" command="load"/>
+    <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller" />
+
+    <!-- The rest of the params are specific to this plugin -->
+    <!--<rosparam file="$(find ur5_robotiq_moveit_config)/config/fake_controllers.yaml"/>-->
+  </group>
+
+    <!-- If database loading was enabled, start mongodb as well -->
+    <include file="$(find ur5_robotiq_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)"/>
+
+    <rosparam file="$(find ur5_robotiq_moveit_config)/config/controllers.yaml"/>
 
     <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
     <include file="$(find ur5_robotiq_moveit_config)/launch/move_group.launch">
       <arg name="allow_trajectory_execution" value="true"/>  
-      <arg name="fake_execution" value="true"/>
+      <!--<arg name="fake_execution" value="true"/>-->
       <arg name="info" value="true"/>
       <arg name="debug" value="$(arg debug)"/>
       <arg name="load_robot_description" value="false"/>
+      <arg name="joint_states_topic" value="ur5_robotiq_joint_limited/joint_states"/>
     </include>
 
 
@@ -43,20 +59,5 @@
       <arg name="config" value="true"/>
       <arg name="debug" value="$(arg debug)"/>
     </include>
-
-    <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
-    <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
-
-    <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml" command="load"/>
-    <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller" />
-
-    <!-- The rest of the params are specific to this plugin -->
-    <rosparam file="$(find ur5_robotiq_moveit_config)/config/fake_controllers.yaml"/>
-    
-
-    <!-- If database loading was enabled, start mongodb as well -->
-    <include file="$(find ur5_robotiq_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)"/>
-  </group>
-
 </launch>
  
