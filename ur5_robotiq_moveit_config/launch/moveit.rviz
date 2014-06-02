@@ -4,10 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /MotionPlanning1
         - /MotionPlanning1/Scene Geometry1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
+        - /MotionPlanning1/Planning Metrics1
         - /MotionPlanning1/Planned Path1
       Splitter Ratio: 0.74256
     Tree Height: 392
@@ -282,7 +284,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -294,22 +296,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 4.09762
+      Distance: 3.86665
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.392865
-        Y: 0.0800199
+        X: -0.390468
+        Y: 0.0461022
         Z: 1.04309e-07
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.319797
+      Pitch: -0.0402028
       Target Frame: base_link
       Value: XYOrbit (rviz)
-      Yaw: 0.846791
+      Yaw: 0.716793
     Saved: ~
 Window Geometry:
   Displays:

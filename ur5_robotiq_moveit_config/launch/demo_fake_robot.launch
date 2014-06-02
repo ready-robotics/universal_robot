@@ -23,8 +23,7 @@
     <!-- Load joint controller configurations from YAML filoe to parameter server -->
   <rosparam file="$(find ur5_robotiq_control)/config/ur5_robotiq_control.yaml" command="load"/>
 <!--   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/> -->
-  <node name="arm_controller_spawner" pkg="controller_manager" ns="ur5_robotiq_joint_limited" type="spawner" respawn="false" output="screen" args="joint_state_controller shoulder_pan_joint_controller  shoulder_lift_joint_controller elbow_joint_controller wrist_1_joint_controller wrist_2_joint_controller wrist_3_joint_controller ee_fixed_joint_controller robotiq_85_base_joint_controller
-    robotiq_85_left_knuckle_joint_controller robotiq_85_right_knuckle_joint_controller robotiq_85_left_finger_joint_controller robotiq_85_right_finger_joint_controller robotiq_85_left_inner_knuckle_joint_controller robotiq_85_right_inner_knuckle_joint_controller robotiq_85_left_finger_tip_joint_controller robotiq_85_right_finger_joint_controller"/>
+  <node name="arm_controller_spawner" pkg="controller_manager" ns="ur5_robotiq_joint_limited" type="spawner" respawn="false" output="screen" args="joint_state_controller shoulder_pan_joint_controller  shoulder_lift_joint_controller elbow_joint_controller wrist_1_joint_controller wrist_2_joint_controller wrist_3_joint_controller" />
 
   <!-- If needed, broadcast static tf for robot root -->
 
@@ -35,9 +34,14 @@
   </node> -->
   
   <!-- Given the published joint states, publish tf for the robot links -->
-<!--   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" /> -->
 
   <group ns="ur5_robotiq_joint_limited" >
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true">
+    </node>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    </node>
 
     <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
     <include file="$(find ur5_robotiq_moveit_config)/launch/move_group.launch">
@@ -53,7 +57,6 @@
     <include file="$(find ur5_robotiq_moveit_config)/launch/moveit_rviz.launch">
       <arg name="config" value="true"/>
       <arg name="debug" value="$(arg debug)"/>
-      <remap to="/ur5_robotiq_joint_limited/joint_states" from="/joint_states" />
     </include>
 
     <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
