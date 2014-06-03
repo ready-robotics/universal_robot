@@ -2,7 +2,7 @@
 
 <robot name="ur5" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="robotiq_c_model" params="root_link hide_underactuated">
+  <xacro:macro name="robotiq_c_model" params="root_link show_underactuated gravity">
     <joint name="adapter_root_link" type="fixed">
       <parent link="${root_link}" />
       <child link="robotiq_85_adapter_link" />
@@ -60,7 +60,7 @@
       </collision>
     </link>
 
-    <xacro:if value="${hide_underactuated}">
+    <xacro:if value="${show_underactuated}">
       <!--  /\  -->
       <!--  /\  -->
       <joint name="robotiq_85_left_knuckle_joint" type="revolute">
@@ -77,7 +77,7 @@
         <axis xyz="1 0 0"/>
         <origin rpy="1.5707 -1.5707 0" xyz=".04191 -.0306 0"/>
         <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-        <xacro:if value="${hide_underactuated}">
+        <xacro:if value="${show_underactuated}">
           <mimic joint="robotiq_85_left_knuckle_joint" multiplier="1"/>
         </xacro:if>
       </joint>
@@ -193,7 +193,7 @@
       <axis xyz="1 0 0"/>
       <origin rpy="1.5707 1.5707 0" xyz=".04843 .0127 0"/>
       <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-      <xacro:if value="${hide_underactuated}">
+      <xacro:if value="${show_underactuated}">
         <mimic joint="robotiq_85_left_knuckle_joint" offset="0"/>
       </xacro:if>
     </joint> 
@@ -204,7 +204,7 @@
       <axis xyz="1 0 0"/>
       <origin rpy="-1.5707 -1.5707 0" xyz=".04843 -.0127 0"/>
       <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-      <xacro:if value="${hide_underactuated}">
+      <xacro:if value="${show_underactuated}">
         <mimic joint="robotiq_85_left_knuckle_joint" offset="0"/>
       </xacro:if>
     </joint>
@@ -259,7 +259,7 @@
       <axis xyz="1 0 0"/>
       <origin rpy="0 0 0" xyz="0 .04196 -.0388"/>
       <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-      <xacro:if value="${hide_underactuated}">
+      <xacro:if value="${show_underactuated}">
         <mimic joint="robotiq_85_left_knuckle_joint" multiplier="-1"/>
       </xacro:if>
     </joint>
@@ -270,7 +270,7 @@
       <axis xyz="1 0 0"/>
       <origin rpy="0 0 0" xyz="0 .04196 -.0388"/>
       <limit lower="0" upper="1.5707" velocity="2.0" effort="1000"/>
-      <xacro:if value="${hide_underactuated}">
+      <xacro:if value="${show_underactuated}">
         <mimic joint="robotiq_85_left_knuckle_joint" multiplier="-1"/>
       </xacro:if>
     </joint>
@@ -317,7 +317,7 @@
       </collision>
     </link>
 
-    <xacro:if value="${hide_underactuated}">
+    <xacro:if value="${show_underactuated}">
       <transmission name="robotiq_85_left_knuckle_trans">
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="robotiq_85_left_knuckle_joint"/>
@@ -373,58 +373,94 @@
       </actuator>
     </transmission>
 
-    <gazebo reference="robotiq_85_adapter_link">
-      <selfCollide>true</selfCollide>
-      <gravity>true</gravity>
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-    <gazebo reference="robotiq_85_base_link">
-      <selfCollide>true</selfCollide>
-      <gravity>true</gravity>
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-    <xacro:if value="${hide_underactuated}">
-      <gazebo reference="robotiq_85_left_knuckle_link">
+    <xacro:if value="${gravity}">
+      <gazebo reference="robotiq_85_adapter_link">
         <selfCollide>true</selfCollide>
-        <gravity>true</gravity>
-        <turnGravityOff>true</turnGravityOff>
+        <turnGravityOff>false</turnGravityOff>
       </gazebo>
-      <gazebo reference="robotiq_85_right_knuckle_link">
+      <gazebo reference="robotiq_85_base_link">
         <selfCollide>true</selfCollide>
-        <gravity>true</gravity>
-        <turnGravityOff>true</turnGravityOff>
+        <turnGravityOff>false</turnGravityOff>
       </gazebo>
-      <gazebo reference="robotiq_85_left_finger_link">
+      <xacro:if value="${show_underactuated}">
+        <gazebo reference="robotiq_85_left_knuckle_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>false</turnGravityOff>
+        </gazebo>
+        <gazebo reference="robotiq_85_right_knuckle_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>false</turnGravityOff>
+        </gazebo>
+        <gazebo reference="robotiq_85_left_finger_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>false</turnGravityOff>
+        </gazebo>
+        <gazebo reference="robotiq_85_right_finger_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>false</turnGravityOff>
+        </gazebo>
+      </xacro:if>
+      <gazebo reference="robotiq_85_left_inner_knuckle_link">
         <selfCollide>true</selfCollide>
-        <gravity>true</gravity>
-        <turnGravityOff>true</turnGravityOff>
+        <turnGravityOff>false</turnGravityOff>
       </gazebo>
-      <gazebo reference="robotiq_85_right_finger_link">
+      <gazebo reference="robotiq_85_right_inner_knuckle_link">
         <selfCollide>true</selfCollide>
-        <gravity>true</gravity>
-        <turnGravityOff>true</turnGravityOff>
+        <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+      <gazebo reference="robotiq_85_left_finger_tip_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>false</turnGravityOff>
+      </gazebo>
+      <gazebo reference="robotiq_85_right_finger_tip_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>false</turnGravityOff>
       </gazebo>
     </xacro:if>
-    <gazebo reference="robotiq_85_left_inner_knuckle_link">
-      <selfCollide>true</selfCollide>
-      <gravity>true</gravity>
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-    <gazebo reference="robotiq_85_right_inner_knuckle_link">
-      <selfCollide>true</selfCollide>
-      <gravity>true</gravity>
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-  </xacro:macro>
-  <gazebo reference="robotiq_85_left_finger_tip_link">
-    <selfCollide>true</selfCollide>
-    <gravity>true</gravity>
-    <turnGravityOff>true</turnGravityOff>
-  </gazebo>
-  <gazebo reference="robotiq_85_right_finger_tip_link">
-    <selfCollide>true</selfCollide>
-    <gravity>true</gravity>
-    <turnGravityOff>true</turnGravityOff>
-  </gazebo>
+    <xacro:unless value="${gravity}">
+      <gazebo reference="robotiq_85_adapter_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>true</turnGravityOff>
+      </gazebo>
+      <gazebo reference="robotiq_85_base_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>true</turnGravityOff>
+      </gazebo>
+      <xacro:if value="${show_underactuated}">
+        <gazebo reference="robotiq_85_left_knuckle_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>true</turnGravityOff>
+        </gazebo>
+        <gazebo reference="robotiq_85_right_knuckle_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>true</turnGravityOff>
+        </gazebo>
+        <gazebo reference="robotiq_85_left_finger_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>true</turnGravityOff>
+        </gazebo>
+        <gazebo reference="robotiq_85_right_finger_link">
+          <selfCollide>true</selfCollide>
+          <turnGravityOff>true</turnGravityOff>
+        </gazebo>
+      </xacro:if>
+      <gazebo reference="robotiq_85_left_inner_knuckle_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>true</turnGravityOff>
+      </gazebo>
+      <gazebo reference="robotiq_85_right_inner_knuckle_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>true</turnGravityOff>
+      </gazebo>
+      <gazebo reference="robotiq_85_left_finger_tip_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>true</turnGravityOff>
+      </gazebo>
+      <gazebo reference="robotiq_85_right_finger_tip_link">
+        <selfCollide>true</selfCollide>
+        <turnGravityOff>true</turnGravityOff>
+      </gazebo>
+    </xacro:unless>
 
+  </xacro:macro>
 </robot>
