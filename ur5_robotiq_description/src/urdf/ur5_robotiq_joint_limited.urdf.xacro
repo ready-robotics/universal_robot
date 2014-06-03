@@ -5,6 +5,10 @@
   <xacro:include filename="$(find ur5_robotiq_description)/src/urdf/base_ur5.urdf.xacro" />
   <xacro:robot></xacro:robot>
 
+  
+  <xacro:include filename="$(find ur5_robotiq_description)/src/urdf/robotiq.urdf.xacro" />
+  <xacro:robotiq_c_model root_link="ee_fixed_link" ></xacro:robotiq_c_model>
+
   <!--
   <link name="world" />
   <joint name= "world_joint" type="fixed">
