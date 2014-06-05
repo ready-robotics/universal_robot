@@ -38,4 +38,6 @@ To run with the fake robot:
 roscore
 amanda@jade-shadow:~/catkin_ws/src/universal_robot/ur5_robotiq_moveit_config/launch$ roslaunch demo_fake_robot.launch 
 amanda@jade-shadow:~/catkin_ws/src/universal_robot/scripts$ ./cartesian_movement.py 
-amanda@jade-shadow:~/catkin_ws/src/code_sprint_1/src/scripts$ ./talker.py 
+amanda@jade-shadow:~/catkin_ws/src/code_sprint_1/src/scripts$ ./test_gripper.py 
+
+In the test gripper.py file, if you change the position value from 0 to 1 it changes the gripper from open to close.  The actual joint positions for the gripper's finger joints are located in cartesian_movement.py

@@ -18,6 +18,7 @@ class CartPusher(object):
 
         rospy.Subscriber("joint_states", sensor_msgs.msg.JointState, self.joint_state_callback)
         rospy.Subscriber("dmp", cartesian_trajectory_msgs.msg.CartesianTrajectory, self.dmp_callback)
+        rospy.Subscriber("gripper",control_msgs.msg.GripperCommand,self.gripper_callback)
         print "waiting for service compute_cartesian_path"
         rospy.wait_for_service('compute_cartesian_path')
         self.get_cartesian_path = rospy.ServiceProxy('compute_cartesian_path', GetCartesianPath)
@@ -34,6 +35,47 @@ class CartPusher(object):
         my_object.joint_state.effort = msg.effort
         self.newest_joint_state = my_object
         # rospy.loginfo(msg)
+
+    def gripper_callback(self,msg):
+        global client2
+        gripper_position = msg.position
+        gripper_max_effort = msg.max_effort
+
+        if gripper_position == 0:
+            joint_trajectory_positions = [0, 0, 0, 0] # The computed solution trajectory, for the desired group, in configuration space
+        elif gripper_position == 1:
+            joint_trajectory_positions= [2.4, 2.4, 0, 0]
+        else:
+            joint_trajectory_positions = [0, 0, 0, 0]
+        joint_trajectory_velocities = [2, 2, 2, 2]
+        joint_trajectory_duration = rospy.Duration.from_sec(3)
+
+        # The following code
+        # 1. Reads joint trajectory out of resp and puts it into a follow joint trajectory action
+        # 2. Then it calls the follow joint trajectory action
+
+        JOINT_NAMES = ['robotiq_85_left_inner_knuckle_joint', 
+                        'robotiq_85_right_inner_knuckle_joint', 
+                        'robotiq_85_left_finger_tip_joint', 
+                        'robotiq_85_right_finger_tip_joint']
+
+        g = FollowJointTrajectoryGoal()
+        g.trajectory = JointTrajectory()
+        g.trajectory.joint_names = JOINT_NAMES
+        g.trajectory.points = [ JointTrajectoryPoint(
+            positions=joint_trajectory_positions, 
+            velocities=joint_trajectory_velocities, 
+            time_from_start=joint_trajectory_duration)]
+
+        client2.send_goal(g)
+        try:
+            client2.wait_for_result()
+        except KeyboardInterrupt:
+            client2.cancel_goal()
+            raise
+
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
 
     def dmp_callback(self,msg):
         global client
@@ -72,7 +114,7 @@ class CartPusher(object):
             # 2. Then it calls the follow joint trajectory action
 
             JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint', 'ee_fixed_joint' 'robotiq_85_base_joint']
+                   'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
 
             g = FollowJointTrajectoryGoal()
             g.trajectory = JointTrajectory()
@@ -97,9 +139,11 @@ if __name__ == "__main__":
     global client
     try:
         rospy.init_node('cartesian_movement_listener', anonymous=True)
-        client = actionlib.SimpleActionClient('arm_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+        client = actionlib.SimpleActionClient('ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+        client2 = actionlib.SimpleActionClient('ur5_robotiq_joint_limited/hand_trajectory_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
         print "Waiting for server..."
         client.wait_for_server()
+        client2.wait_for_server()
         print "Connected to server"
         cp = CartPusher()
     except KeyboardInterrupt:

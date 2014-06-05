@@ -29,6 +29,10 @@
     <node name="arm_controller_spawner" pkg="controller_manager"
       type="spawner" respawn="true" output="screen" args="arm_trajectory_controller" />
 
+    <!--   <rosparam file="$(find ur_gazebo)/controller/arm_controller_ur5.yaml" command="load"/> -->
+    <node name="hand_controller_spawner" pkg="controller_manager"
+      type="spawner" respawn="true" output="screen" args="hand_trajectory_controller" />
+
     <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
 
     <rosparam file="$(find ur_gazebo)/controller/joint_state_controller.yaml" command="load"/>

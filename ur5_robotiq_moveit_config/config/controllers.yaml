@@ -5,3 +5,9 @@ controller_list:
     type: FollowJointTrajectory
     default: true
     joints: [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint, wrist_3_joint]
+
+  - name: ur5_robotiq_joint_limited/hand_trajectory_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints: [robotiq_85_left_inner_knuckle_joint, robotiq_85_right_inner_knuckle_joint, robotiq_85_left_finger_tip_joint, robotiq_85_right_finger_tip_joint]

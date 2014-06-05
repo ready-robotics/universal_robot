@@ -23,15 +23,25 @@ arm_trajectory_controller:
   action_monitor_rate: 10
 
 hand_trajectory_controller:
-  type: "effort_controllers/JointTrajectoryController"
+  type: "position_controllers/JointTrajectoryController"
   joints:
-    - robotiq_85_base_joint
-    - robotiq_85_left_knuckle_joint
-    - robotiq_85_right_knuckle_joint
-    - robotiq_85_left_finger_joint
-    - robotiq_85_right_finger_joint
+    # - robotiq_85_base_joint
+    # - robotiq_85_left_knuckle_joint
+    # - robotiq_85_right_knuckle_joint
+    # - robotiq_85_left_finger_joint
+    # - robotiq_85_right_finger_joint
     - robotiq_85_left_inner_knuckle_joint
     - robotiq_85_right_inner_knuckle_joint
     - robotiq_85_left_finger_tip_joint
     - robotiq_85_right_finger_tip_joint
+  constraints:
+      goal_time: 0.6
+      stopped_velocity_tolerance: 0.5
+      robotiq_85_left_inner_knuckle_joint: {trajectory: 0.1, goal: 0.1}
+      robotiq_85_right_inner_knuckle_joint: {trajectory: 0.1, goal: 0.1}
+      robotiq_85_left_finger_tip_joint: {trajectory: 0.1, goal: 0.1}
+      robotiq_85_right_finger_tip_joint: {trajectory: 0.1, goal: 0.1}
+  stop_trajectory_duration: 0.5
+  state_publish_rate:  25
+  action_monitor_rate: 10
 
