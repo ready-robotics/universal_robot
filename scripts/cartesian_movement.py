@@ -143,7 +143,7 @@ if __name__ == "__main__":
         client2 = actionlib.SimpleActionClient('ur5_robotiq_joint_limited/hand_trajectory_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
         print "Waiting for server..."
         client.wait_for_server()
-        client2.wait_for_server()
+        #client2.wait_for_server()
         print "Connected to server"
         cp = CartPusher()
     except KeyboardInterrupt:

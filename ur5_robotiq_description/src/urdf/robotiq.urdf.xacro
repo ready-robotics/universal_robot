@@ -10,7 +10,7 @@
 
     <link name="robotiq_85_adapter_link">
       <inertial>
-        <mass value="10"/>
+        <mass value="0.1"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
       </inertial>
@@ -42,7 +42,7 @@
 
     <link name="robotiq_85_base_link">
       <inertial>
-        <mass value="10"/>
+        <mass value="0.1"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
       </inertial>
@@ -86,7 +86,7 @@
 
       <link name="robotiq_85_left_knuckle_link">
         <inertial>
-          <mass value="10"/>
+          <mass value="0.01"/>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -106,7 +106,7 @@
 
       <link name="robotiq_85_right_knuckle_link">
         <inertial>
-          <mass value="10"/>
+          <mass value="0.01"/>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -146,7 +146,7 @@
 
       <link name="robotiq_85_left_finger_link">
         <inertial>
-          <mass value="10"/>
+          <mass value="0.01"/>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -166,7 +166,7 @@
 
       <link name="robotiq_85_right_finger_link">
         <inertial>
-          <mass value="10"/>
+          <mass value="0.01"/>
           <origin xyz="0 0 0" rpy="0 0 0"/>
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -213,7 +213,7 @@
 
     <link name="robotiq_85_left_inner_knuckle_link">
       <inertial>
-        <mass value="10"/>
+        <mass value="0.01"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
       </inertial>
@@ -233,7 +233,7 @@
 
     <link name="robotiq_85_right_inner_knuckle_link">
       <inertial>
-        <mass value="10"/>
+        <mass value="0.01"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
       </inertial>
@@ -279,7 +279,7 @@
 
     <link name="robotiq_85_left_finger_tip_link">
       <inertial>
-        <mass value="10"/>
+        <mass value="0.01"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
       </inertial>
@@ -299,7 +299,7 @@
 
     <link name="robotiq_85_right_finger_tip_link">
       <inertial>
-        <mass value="10"/>
+        <mass value="0.01"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
       </inertial>
