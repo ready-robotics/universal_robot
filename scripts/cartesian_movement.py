@@ -42,10 +42,11 @@ class CartPusher(object):
         gripper_max_effort = msg.max_effort
 
         if gripper_position == 0:
-            joint_trajectory_positions = [0, 0, 0, 0] # The computed solution trajectory, for the desired group, in configuration space
+            joint_trajectory_positions = [0, 0, 0, 0]
         elif gripper_position == 1:
             joint_trajectory_positions= [2.4, 2.4, 0, 0]
         else:
+            print "The only options are 0 or 1"
             joint_trajectory_positions = [0, 0, 0, 0]
         joint_trajectory_velocities = [2, 2, 2, 2]
         joint_trajectory_duration = rospy.Duration.from_sec(3)
