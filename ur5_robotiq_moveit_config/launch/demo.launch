@@ -22,7 +22,7 @@
   <!-- UR driver consists of a single node - does not currrently follow ROS-I convention -->
   <node name="ur_driver" pkg="ur_driver" type="driver.py" args="192.168.1.155" output="screen">
     <!--    <remap from="follow_joint_trajectory/" to="joint_trajectory_action/"/> -->
-    <remap from="follow_joint_trajectory/cancel" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/cancel" />
+    <remap from="follow_joint_trajectory/cancel" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory/cancel" />
     <remap from="follow_joint_trajectory/feedback" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory/feedback" />
     <remap from="follow_joint_trajectory/goal" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory/goal" />
     <remap from="follow_joint_trajectory/result" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory/result" />
@@ -45,6 +45,7 @@
     <arg name="fake_execution" value="false"/>
     <arg name="info" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
+    <arg name="load_robot_description" value="false"/>
     <!-- <arg name="joint_states_topic" value="ur5_robotiq_joint_limited/joint_states"/> -->
   </include>
 
