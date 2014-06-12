@@ -17,11 +17,11 @@
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->
-  
+
 
   <!-- UR driver consists of a single node - does not currrently follow ROS-I convention -->
   <node name="ur_driver" pkg="ur_driver" type="driver.py" args="192.168.1.155" output="screen">
- <!--    <remap from="follow_joint_trajectory/" to="joint_trajectory_action/"/> -->
+    <!--    <remap from="follow_joint_trajectory/" to="joint_trajectory_action/"/> -->
     <remap from="follow_joint_trajectory/cancel" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/cancel" />
     <remap from="follow_joint_trajectory/feedback" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory/feedback" />
     <remap from="follow_joint_trajectory/goal" to="/ur5_robotiq_joint_limited/arm_trajectory_controller/follow_joint_trajectory/goal" />
@@ -31,11 +31,11 @@
   </node>
 
   <!-- We do not have a robot connected, so publish fake joint states -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+  <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
     <param name="/use_gui" value="false"/> 
     <rosparam param="/source_list">[/joint_states]</rosparam>
-  </node>
-  
+  </node>-->
+
   <!-- Given the published joint states, publish tf for the robot links -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
 
@@ -45,6 +45,7 @@
     <arg name="fake_execution" value="false"/>
     <arg name="info" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
+    <!-- <arg name="joint_states_topic" value="ur5_robotiq_joint_limited/joint_states"/> -->
   </include>
 
   <!-- Run Rviz and load the default config to see the state of the move_group node -->
