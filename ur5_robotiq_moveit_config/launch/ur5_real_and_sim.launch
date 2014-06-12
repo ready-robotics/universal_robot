@@ -10,7 +10,7 @@
   <arg name="sim_only" default="true" />
 
   <!-- start gazebo with an empty plane -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" unless="sim_only">
     <arg name="world_name" default="worlds/empty.world"/>
   </include>
 
