@@ -7,11 +7,11 @@
   <!-- Simulation only -->
   <arg name="sim_only" default="true" />
 
-  <include file="$(find ur5_robotiq_moveit_config)/launch/planning_context.launch">
+<!--   <include file="$(find ur5_robotiq_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="$(arg load_robot_description)"/>
     <arg name="real_robot" value="true" unless="$(arg sim_only)"/>
   </include>
-
+ -->
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />

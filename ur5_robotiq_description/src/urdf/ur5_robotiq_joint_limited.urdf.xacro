@@ -7,7 +7,7 @@
 
   
   <xacro:include filename="$(find ur5_robotiq_description)/src/urdf/robotiq.urdf.xacro" />
-  <xacro:robotiq_c_model root_link="ee_fixed_link" show_underactuated="true" gravity="false"></xacro:robotiq_c_model>
+  <xacro:robotiq_c_model root_link="ee_fixed_link" show_underactuated="false" gravity="false"></xacro:robotiq_c_model>
 
   <!--
   <xacro:include filename="$(find ur5_robotiq_description)/src/urdf/s_model/s-model_articulated_macro.xacro"/>
