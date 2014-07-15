@@ -92,11 +92,10 @@ RESET_PROGRAM = '''def resetProg():
 end
 '''
 
-FREE_DRIVE_PROGRAM = '''def freeDriveProg():
+FREE_DRIVE_PROGRAM = '''def freedriveProg():
   set robotmode freedrive
 end
 '''
-#RESET_PROGRAM = ''
     
 class UR5Connection(object):
     TIMEOUT = 1.0
@@ -142,7 +141,7 @@ class UR5Connection(object):
         self.robot_state = self.READY_TO_PROGRAM
 
     def send_free_drive_program(self):
-        self.__sock.sendall(FREE_DRIVE_PROGRAM)
+        self.__sock.sendall(FREE_DRIVE_PROGRAM.strip())
         self.robot_state = self.FREE_DRIVE
         
     def disconnect(self):
@@ -547,15 +546,18 @@ class UR5ServoDriver(object):
     SERVO_ACTIVE = 1
     FREE_DRIVE = 2
 
-    def __init__(self, robot):
-        self.robot = robot
-        self.init_joint_states = self.robot.get_joint_states()   
-        self.init_tcp_state = self.robot.get_tcp_state() 
+    def __init__(self):
+        self.robot = None
         self.pose_sub = rospy.Subscriber("/ur5_command_pose",Pose,self.pose_cb)
         self.__mode = self.IDLE
         movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
         get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
         rospy.logwarn('UR5 SERVO INTERFACES SET UP')
+
+    def set_up_robot(self,robot):
+        self.robot = robot
+        self.init_joint_states = self.robot.get_joint_states()   
+        self.init_tcp_state = self.robot.get_tcp_state() 
 
     def pose_cb(self,msg):
         pose = msg.data
@@ -565,22 +567,23 @@ class UR5ServoDriver(object):
         #     pass
 
     def service_movel(self,data):
-        target = data.target # target is a Pose
-        T = tf_c.fromMsg(target)
-        rot = T.M.GetRPY()
-        pose = list(T.p) + [rot[0], rot[1], rot[2]]
-        return str(pose)
-        # try:
-        #     self.robot.send_movel(999, pose)
-        # except socket.error:
-        #     pass
+        if self.robot:
+            target = data.target # target is a Pose
+            T = tf_c.fromMsg(target)
+            rot = T.M.GetRPY()
+            pose = list(T.p) + [rot[0], rot[1], rot[2]]
+            return str(pose)
+            # try:
+            #     self.robot.send_movel(999, pose)
+            # except socket.error:
+            #     pass
 
     def service_get_tcp_pose(self,data):
-        resp = ur_driver.srv.get_tcp_poseResponse()
-        resp.current_pose = self.robot.get_tcp_state()
-        resp.current_euler = self.robot.get_tcp_state_as_euler()
-        return resp
-
+        if self.robot:
+            resp = ur_driver.srv.get_tcp_poseResponse()
+            resp.current_pose = self.robot.get_tcp_state()
+            resp.current_euler = self.robot.get_tcp_state_as_euler()
+            return resp
 
 # class UR5TrajectoryFollower(object):
 #     RATE = 0.02
@@ -775,14 +778,15 @@ class UR5ServoDriver(object):
 
 # GLOBAL SERVICES --------------------------------------------------------------
 def service_free_drive(data):
+    global free_drive
     active = data.active
     if active == False:
         free_drive = False
-        print free_drive
+        # print free_drive
         return 'set freedrive false'
     else:
         free_drive = True
-        print free_drive
+        # print free_drive
         return 'set freedrive true'
     pass
 
@@ -831,9 +835,14 @@ def main():
     
     servo_driver = None
 
+    global free_drive
     print 'freedrive set to false'
     free_drive_enabled = False
     free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,service_free_drive)
+
+
+    servo_driver = UR5ServoDriver()
+    rospy.logwarn('SERVO DRIVER INTERFACES RUNNING')
     
     # action_server = None
     try:
@@ -845,18 +854,18 @@ def main():
                 if prevent_programming:
                     print "Programming now prevented"
                     connection.send_reset_program()
-                print 'connected'
                 if free_drive_enabled == True:
-                    print 'freedrive currently ' + str(free_drive)
+                    # print 'freedrive currently ' + str(free_drive)
                     if free_drive == False:
-                        # connection.send_reset_program()
+                        connection.send_reset_program()
                         # connection.send_program()
                         free_drive_enabled = False
                         rospy.logwarn('ROBOT FREEDRIVE DISABLED')
                 elif free_drive_enabled == False:
-                    print 'freedrive currently ' + str(free_drive)
+                    # print 'freedrive currently ' + str(free_drive)
                     if free_drive == True:
-                        # connection.send_freedrive_program()
+                        # connection.send_reset_program()
+                        connection.send_free_drive_program()
                         free_drive_enabled = True
                         rospy.logwarn('ROBOT FREEDRIVE ENABLED')
             else:
@@ -879,7 +888,7 @@ def main():
                         break
                 rospy.loginfo("Robot connected")
 
-                servo_driver = UR5ServoDriver(connected_robot)
+                servo_driver.set_up_robot(connected_robot)
                 rospy.logwarn('UR5 CONNECTED TO SERVO DRIVER')
                 # if action_server:
                 #     action_server.set_robot(r)
