@@ -133,7 +133,6 @@ class UR5Connection(object):
         self.robot_state = self.READY_TO_PROGRAM
 
     def send_program_direct(self,p):
-        print p
         self.__sock.sendall(p)
         self.robot_state = self.EXECUTING
         
@@ -236,12 +235,36 @@ class UR5Connection(object):
                 self.__trigger_disconnected()
                 self.__keep_running = False
 
-
-def setConnectedRobot(r):
-    global connected_robot, connected_robot_lock
-    with connected_robot_lock:
-        connected_robot = r
-        connected_robot_cond.notify()
+    def get_robot_state(self):
+        if not self.robot_state == self.DISCONNECTED:
+            S = self.last_state
+            if not S:
+                return 'No Messages Yet'
+            S = self.last_state.robot_mode_data.robot_mode
+            if S == 0:
+                return 'RUNNING' 
+            elif S == 1:
+                return 'FREEDRIVE' 
+            elif S == 2:
+                return 'READY' 
+            elif S == 3:
+                return 'INITIALIZING' 
+            elif S == 4:
+                return 'SECURITY_STOPPED' 
+            elif S == 5:
+                return 'EMERGENCY_STOPPED' 
+            elif S == 6:
+                return 'FATAL_ERROR' 
+            elif S == 7:
+                return 'NO_POWER' 
+            elif S == 8:
+                return 'NOT_CONNECTED' 
+            elif S == 9:
+                return 'SHUTDOWN' 
+            elif S == 0:
+                return 'SAFEGUARD_STOP'
+        else:
+            return 'ROBOT IS DISCONNECTED'
 
 def getConnectedRobot(wait=False, timeout=-1):
     started = time.time()
@@ -280,11 +303,17 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
                                      (now - self.last_joint_states.header.stamp).to_sec())
                     raise EOF()
 
+    def setConnectedRobot(self,r):
+        global connected_robot, connected_robot_lock
+        with connected_robot_lock:
+            connected_robot = r
+            connected_robot_cond.notify()
+
     def handle(self):
         self.socket_lock = threading.Lock()
         self.last_joint_states = None
         self.last_tcp_state = None
-        setConnectedRobot(self)
+        self.setConnectedRobot(self)
         print "Handling a request"
         try:
             buf = self.recv_more()
@@ -359,7 +388,7 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
                     buf = buf + self.recv_more()
         except EOF, ex:
             print "Connection closed (command):", ex
-            setConnectedRobot(None)
+            self.setConnectedRobot(None)
 
     def send_quit(self):
         with self.socket_lock:
@@ -425,12 +454,14 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
 
     def get_tcp_state_as_euler(self):
         return self.last_tcp_state_as_euler
- 
+
+# SERVO DRIVER ----------------------------------------------------------------#
+
 class UR5ServoDriver(object):
     DISCONNECTED = 0
     IDLE = 1
-    SERVO_ACTIVE = 2
-    FREE_DRIVE = 3
+    SERVO = 2
+    FREEDRIVE = 3
 
     def __init__(self):
         rospy.logwarn('UR5 --> DRIVER STARTED')
@@ -440,16 +471,16 @@ class UR5ServoDriver(object):
         self.robot = None
         self.connection = None
         self.__mode = self.DISCONNECTED
+        self.freedrive = False
 
 
         rospy.logwarn('UR5 --> Loading Interfaces')
         # Subscribers
         self.pose_sub = rospy.Subscriber("/ur5_command_pose",Pose,self.pose_cb)
         # Services
-        movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
-        free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,self.service_free_drive)
-        get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
-
+        self.movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
+        self.free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,self.service_free_drive)
+        self.get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
 
         rospy.logwarn('UR5 --> Initializing')
         # Set up UR5 parameters
@@ -459,9 +490,13 @@ class UR5ServoDriver(object):
         # Create and start TCP Server
         self.set_up_tcp_server()
         # Connect to UR5
-        self.connect_to_robot()
+        self.connect_to_robot(self.program_servo)
         #Finished
+        self.set_mode(self.IDLE)
         rospy.logwarn('UR5 --> UR5 Base Program Running Successfully')
+
+        # Wait for things a bit (debug)
+        rospy.sleep(2)
 
         # Run
         try:
@@ -480,21 +515,72 @@ class UR5ServoDriver(object):
                 else:
                     print 'No program found on robot... finished.'
                 self.connection.send_reset_program()
-                self.connection.send_program_direct(self.program_run)
             except:
                 pass
             rospy.signal_shutdown("KeyboardInterrupt")
 
     def update(self):
         # Robot is disconnected, this shouldnt really happen
-        if self.__mode == DISCONNECTED:
+        if self.__mode == self.DISCONNECTED:
             rospy.logerr('UR5 --> THE ROBOT IS DISCONNECTED')
             pass
         # Robot is idle, and therefore connected with program_reset loaded
-        elif self.__mode == IDLE:
+        elif self.__mode == self.IDLE:
+            rospy.logwarn('UR5 --> Mode switching to SERVO')
+            # Quit the running program
+            self.connected_robot = getConnectedRobot(wait=False)
+            if self.connected_robot: 
+                print "Quitting Current Program"
+                connected_robot.send_quit()
+            self.connect_to_robot(self.program_servo)
+            self.connection.send_program()
+            rospy.logwarn('UR5 --> Sent default program to robot... running.')
+            self.set_mode(self.SERVO)
 
+            # while True:
+            #     while not self.connection.ready_to_program():
+            #         print "Waiting to program"
+            #         time.sleep(1.0)
+            #     # Send Default Program
+            #     self.connection.send_program()
+            #     self.connected_robot = getConnectedRobot(wait=True, timeout=1.0)
+            #     if self.connected_robot:
+            #         break
+        # Currently in servo mode
+        elif self.__mode == self.SERVO:
+            # Check for Freedrive enable
+            if self.freedrive == True:
+                rospy.logwarn('UR5 --> Mode switching to FREEDRIVE')
+                # Quit the running program
+                self.connected_robot = getConnectedRobot(wait=False)
+                if self.connected_robot: 
+                    print "Quitting Current Program"
+                    connected_robot.send_quit()
+                self.connect_to_robot(self.program_freedrive)
+                self.connection.send_program()
+                self.set_mode(self.FREEDRIVE)
+            else:
+                pass                
+        # Currently in freedrive mode
+        elif self.__mode == self.FREEDRIVE:
+            if self.freedrive == False:
+                rospy.logwarn('UR5 --> Mode switching to IDLE')
+                # Quit the running program
+                self.connected_robot = getConnectedRobot(wait=False)
+                if self.connected_robot: 
+                    print "Quitting Current Program"
+                    connected_robot.send_quit()
+                self.connect_to_robot(self.program_run)
+                self.connection.send_program()
+                self.set_mode(self.IDLE)
+            pass
 
-        pass
+    def set_mode(self,m):
+        self.__mode = m
+
+    def read_robot_state(self):
+        state = self.connection.get_robot_state()
+        rospy.logwarn('UR5 [STATE] = '+ str(state))
 
     def load_programs(self):
         rospy.logwarn('UR5 --> Loading Programs for the Robot')
@@ -504,6 +590,8 @@ class UR5ServoDriver(object):
             self.program_freedrive = fin.read() % {"driver_hostname": self.get_my_ip(self.robot_hostname, PORT)}
         with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_run') as fin:
             self.program_run = fin.read() % {"driver_hostname": self.get_my_ip(self.robot_hostname, PORT)}
+        with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_reset') as fin:
+            self.program_reset = fin.read() % {"driver_hostname": self.get_my_ip(self.robot_hostname, PORT)}
 
     def set_up_tcp_server(self):
         rospy.logwarn('UR5 --> Initializing the TCP Server for the Robot')
@@ -512,15 +600,16 @@ class UR5ServoDriver(object):
         self.thread_commander.daemon = True
         self.thread_commander.start()
 
-    def connect_to_robot(self):
+    def connect_to_robot(self,program,reset=True):
         if self.connection:
             print 'Shutting down existing Connection to robot'
             self.connection.disconnect()
         rospy.logwarn('UR5 --> Making New Connection to robot')
-        self.connection = UR5Connection(self.robot_hostname, PORT, self.program_servo)
+        self.connection = UR5Connection(self.robot_hostname, PORT, program)
         self.connection.connect()
-        self.connection.send_reset_program()
-        self.__mode = self.IDLE
+        if reset:
+            self.connection.send_reset_program()
+        self.read_robot_state()
 
     def set_up_robot(self):
         rospy.logwarn('UR5 --> Setting up Robot Parameters')
@@ -576,17 +665,13 @@ class UR5ServoDriver(object):
             return resp
 
     def service_free_drive(self,data):
-        global free_drive
         active = data.active
         if active == False:
-            free_drive = False
-            # print free_drive
-            return 'set freedrive false'
+            self.freedrive = False
+            return 'Freedrive disabled'
         else:
-            free_drive = True
-            # print free_drive
-            return 'set freedrive true'
-        pass
+            self.freedrive = True
+            return 'Freedrive enabled'
     
     def load_joint_offsets(self,joint_names):
         robot_description = rospy.get_param("robot_description")

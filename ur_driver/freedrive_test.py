@@ -14,25 +14,25 @@ if __name__ == '__main__':
     current_pose = None
 
     rospy.init_node("test_servo", anonymous=True, disable_signals=True)
-
+    
+    print 'waiting for service'
     rospy.wait_for_service('/ur_driver/free_drive')
+    print 'calling service with true'
     try:
         free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
         result = free_drive_service(True)
-        print str(result.ack)
+        print 'Service returned: ' + str(result.ack)
     except rospy.ServiceException, e:
         print e
 
     rospy.sleep(5)
 
+    print 'waiting for service'
     rospy.wait_for_service('/ur_driver/free_drive')
+    print 'calling service with false'
     try:
         free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
         result = free_drive_service(False)
-        print str(result.ack)
+        print 'Service returned: ' + str(result.ack)
     except rospy.ServiceException, e:
         print e
-
-
-
-
