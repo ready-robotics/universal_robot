@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import roslib; roslib.load_manifest('ur_driver')
-import time, sys, threading, math
+import time, sys, threading, math, os
 import copy
 import datetime
 import socket, select
@@ -24,13 +24,7 @@ import tf_conversions as tf_c
 import ur_driver
 from ur_driver.srv import *
 
-prevent_programming = False
 
-# Joint offsets, pulled from calibration information stored in the URDF
-#
-# { "joint_name" : offset }
-#
-# q_actual = q_from_driver + offset
 joint_offsets = {}
 
 PORT=30002
@@ -68,9 +62,11 @@ connected_robot = None
 connected_robot_lock = threading.Lock()
 connected_robot_cond = threading.Condition(connected_robot_lock)
 pub_joint_states = rospy.Publisher('joint_states', JointState)
-#dump_state = open('dump_state', 'wb')
 
 class EOF(Exception): pass
+
+def clear_cmd():
+    os.system(['clear','cls'][os.name == 'nt'])
 
 def dumpstacks():
     id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
@@ -128,10 +124,6 @@ class UR5Connection(object):
         self.__thread.start()
 
     def send_program(self):
-        global prevent_programming
-        if prevent_programming:
-            rospy.loginfo("Programming is currently prevented")
-            return
         assert self.robot_state in [self.READY_TO_PROGRAM, self.EXECUTING]
         rospy.loginfo("Programming the robot at %s" % self.hostname)
         self.__sock.sendall(self.program)
@@ -360,7 +352,7 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
                     buf = buf + self.recv_more()
         except EOF, ex:
             print "Connection closed (command):", ex
-            # setConnectedRobot(None)
+            setConnectedRobot(None)
 
     def send_quit(self):
         with self.socket_lock:
@@ -516,6 +508,8 @@ def service_free_drive(data):
         return 'set freedrive true'
     pass
 
+
+
 # MAIN -------------------------------------------------------------------------
 def main():
     rospy.init_node('ur_servo_driver', disable_signals=True)
@@ -523,8 +517,6 @@ def main():
         rospy.logwarn("use_sim_time is set!!!")
 
     # Set up programming environment
-    global prevent_programming
-    prevent_programming = rospy.get_param("prevent_programming", False)
     prefix = rospy.get_param("~prefix", "")
     print "Setting prefix to %s" % prefix
     global joint_names
@@ -559,9 +551,35 @@ def main():
         program_freedrive = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
     with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_run') as fin:
         program_run = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
+
+    # Start Connection for the Robot
+    clear_cmd()
+    print 'Making Connection to robot...'
     connection = UR5Connection(robot_hostname, PORT, program_servo)
     connection.connect()
     connection.send_reset_program()
+
+    while True:
+        while not connection.ready_to_program():
+            print "Waiting to program"
+            time.sleep(1.0)
+        connection.send_program_direct(program_run)
+        rospy.loginfo('Sent Program')
+        print 'Checking for connected robot...'
+        connected_robot = getConnectedRobot(wait=True, timeout=1.0)
+        if connected_robot:
+            print 'Robot found.'
+            break
+
+    print connected_robot
+
+    print 'waiting'
+    while True:
+        rospy.sleep(1)
+
+
+
+
     
     servo_driver = None
 
@@ -580,23 +598,21 @@ def main():
 
             if getConnectedRobot(wait=False):
                 time.sleep(0.2)
-                prevent_programming = rospy.get_param("prevent_programming", False)
-                if prevent_programming:
-                    print "Programming now prevented"
-                    connection.send_reset_program()
 
                 if free_drive_enabled == True:
                     if free_drive == False:
+                        connection.disconnect()
                         connection.connect()
-                        connection.send_program_direct(program_run)
-                        rospy.sleep(.5)
                         connection.send_reset_program()
+                        # rospy.sleep(.5)
+                        # connection.send_program_direct(program_run)
                         free_drive_enabled = False
                         rospy.logwarn('ROBOT FREEDRIVE DISABLED')
 
                 elif free_drive_enabled == False:
                     if free_drive == True:
                         r = getConnectedRobot(wait=False)
+                        print r
                         if r:
                             print 'quitting current program' 
                             r.send_quit()
@@ -613,15 +629,13 @@ def main():
                     while not connection.ready_to_program():
                         print "Waiting to program"
                         time.sleep(1.0)
-                    prevent_programming = rospy.get_param("prevent_programming", False)
                     connection.send_program()
                     rospy.loginfo('Sent Program')
                     connected_robot = getConnectedRobot(wait=True, timeout=1.0)
-                    rospy.loginfo(str(connected_robot))
                     if connected_robot:
                         break
-                rospy.loginfo("Robot connected")
 
+                rospy.logwarn("Robot connected")
                 servo_driver.set_up_robot(connected_robot)
                 rospy.logwarn('UR5 CONNECTED TO SERVO DRIVER')
 
