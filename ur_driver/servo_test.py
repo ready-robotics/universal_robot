@@ -48,7 +48,7 @@ if __name__ == '__main__':
     except rospy.ServiceException, e:
         print e
 
-    rospy.sleep(2)
+    rospy.sleep(9)
 
     rospy.wait_for_service('/ur_driver/free_drive')
     try:

@@ -61,16 +61,6 @@ def driverProg():
       #socket_send_int(7895160)  # Recognizable  ".xxx" or 00787878
       exit_critical
     end
-    #socket_open(HOSTNAME, 50002)
-    send_joint_state()
-    while True:
-      send_joint_state()
-      sync()
-    end
-    sync()
-  end
-
-  thread tcpStatePublisherThread():
     def send_tcp_state():
       p = get_actual_tcp_pose()
       enter_critical
@@ -85,8 +75,10 @@ def driverProg():
       exit_critical
     end
     #socket_open(HOSTNAME, 50002)
-    send_tcp_state()
+    send_joint_state()
     while True:
+      send_joint_state()
+      sync()
       send_tcp_state()
       sync()
     end
@@ -146,7 +138,6 @@ def driverProg():
   send_out("hello")
 
   thread_state = run statePublisherThread()
-  thread_tcpstate = run tcpStatePublisherThread()
   thread_servo = run servoThread()
 
   # Servoes in a circle
@@ -164,7 +155,7 @@ def driverProg():
   #end
 
   while True:
-    #send_out("Listening")
+    send_out("Listening")
     ll = socket_read_binary_integer(1)
 
     if ll[0] == 0:
@@ -250,6 +241,13 @@ def driverProg():
       elif mtype == MSG_STOPJ:
         send_out("Received stopj")
         stopj(1.0)
+      elif mtype == MSG_FREEDRIVE:
+        val = params_mult[1]
+        if val == VAL_TRUE:
+          set robotmode freedrive
+        else:
+          set robotmode run
+        end
       else:
         send_out("Received unknown message type")
       end

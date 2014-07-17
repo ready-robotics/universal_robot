@@ -93,7 +93,8 @@ end
 '''
 
 FREE_DRIVE_PROGRAM = '''def freedriveProg():
-  set robotmode freedrive
+popup("hello world!","Hello World")
+set robotmode freedrive
 end
 '''
     
@@ -140,9 +141,10 @@ class UR5Connection(object):
         self.__sock.sendall(RESET_PROGRAM)
         self.robot_state = self.READY_TO_PROGRAM
 
-    def send_free_drive_program(self):
-        self.__sock.sendall(FREE_DRIVE_PROGRAM.strip())
-        self.robot_state = self.FREE_DRIVE
+    def send_program_direct(self,p):
+        print p
+        self.__sock.sendall(p)
+        self.robot_state = self.EXECUTING
         
     def disconnect(self):
         if self.__thread:
@@ -358,7 +360,7 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
                     buf = buf + self.recv_more()
         except EOF, ex:
             print "Connection closed (command):", ex
-            setConnectedRobot(None)
+            # setConnectedRobot(None)
 
     def send_quit(self):
         with self.socket_lock:
@@ -552,8 +554,10 @@ def main():
 
     # Send servo program
     with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_servo') as fin:
-        program = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
-    connection = UR5Connection(robot_hostname, PORT, program)
+        program_servo = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
+    with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_freedrive') as fin:
+        program_freedrive = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
+    connection = UR5Connection(robot_hostname, PORT, program_servo)
     connection.connect()
     connection.send_reset_program()
     
@@ -564,7 +568,6 @@ def main():
     free_drive_enabled = False
     free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,service_free_drive)
 
-
     servo_driver = UR5ServoDriver()
     rospy.logwarn('SERVO DRIVER INTERFACES RUNNING')
     
@@ -572,30 +575,36 @@ def main():
     try:
         while not rospy.is_shutdown():
             # Checks for disconnect
+
             if getConnectedRobot(wait=False):
                 time.sleep(0.2)
                 prevent_programming = rospy.get_param("prevent_programming", False)
                 if prevent_programming:
                     print "Programming now prevented"
                     connection.send_reset_program()
+
                 if free_drive_enabled == True:
-                    # print 'freedrive currently ' + str(free_drive)
                     if free_drive == False:
+                        r = getConnectedRobot(wait=False)
+                        if r:
+                            print 'quitting current program' 
+                            r.send_quit()
                         connection.send_reset_program()
-                        # connection.send_program()
                         free_drive_enabled = False
                         rospy.logwarn('ROBOT FREEDRIVE DISABLED')
+
                 elif free_drive_enabled == False:
-                    # print 'freedrive currently ' + str(free_drive)
                     if free_drive == True:
-                        # connection.send_reset_program()
-                        connection.send_free_drive_program()
+                        r = getConnectedRobot(wait=False)
+                        if r:
+                            print 'quitting current program' 
+                            r.send_quit()
+                        connection.connect()
+                        connection.send_program_direct(program_freedrive)
                         free_drive_enabled = True
                         rospy.logwarn('ROBOT FREEDRIVE ENABLED')
             else:
                 print "Disconnected.  Reconnecting"
-                # if action_server:
-                #     action_server.set_robot(None)
 
                 rospy.loginfo("Programming the robot")
                 while True:
@@ -614,14 +623,10 @@ def main():
 
                 servo_driver.set_up_robot(connected_robot)
                 rospy.logwarn('UR5 CONNECTED TO SERVO DRIVER')
-                # if action_server:
-                #     action_server.set_robot(r)
-                # else:
-                #     action_server = UR5TrajectoryFollower(r, rospy.Duration(1.0))
-                #     action_server.start()
 
     except KeyboardInterrupt:
         try:
+            connection.send_reset_program()
             r = getConnectedRobot(wait=False)
             rospy.signal_shutdown("KeyboardInterrupt")
             if r: r.send_quit()
