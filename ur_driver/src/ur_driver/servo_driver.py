@@ -557,6 +557,8 @@ def main():
         program_servo = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
     with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_freedrive') as fin:
         program_freedrive = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
+    with open(roslib.packages.get_pkg_dir('ur_driver') + '/prog_run') as fin:
+        program_run = fin.read() % {"driver_hostname": get_my_ip(robot_hostname, PORT)}
     connection = UR5Connection(robot_hostname, PORT, program_servo)
     connection.connect()
     connection.send_reset_program()
@@ -585,10 +587,9 @@ def main():
 
                 if free_drive_enabled == True:
                     if free_drive == False:
-                        r = getConnectedRobot(wait=False)
-                        if r:
-                            print 'quitting current program' 
-                            r.send_quit()
+                        connection.connect()
+                        connection.send_program_direct(program_run)
+                        rospy.sleep(.5)
                         connection.send_reset_program()
                         free_drive_enabled = False
                         rospy.logwarn('ROBOT FREEDRIVE DISABLED')

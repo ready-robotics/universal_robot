@@ -23,4 +23,16 @@ if __name__ == '__main__':
     except rospy.ServiceException, e:
         print e
 
+    rospy.sleep(5)
+
+    rospy.wait_for_service('/ur_driver/free_drive')
+    try:
+        free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
+        result = free_drive_service(False)
+        print str(result.ack)
+    except rospy.ServiceException, e:
+        print e
+
+
+
 
