@@ -425,14 +425,7 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
 
     def get_tcp_state_as_euler(self):
         return self.last_tcp_state_as_euler
-    
-# THIS SEEMS TO BE UNUSED
-# # Waits until all threads have completed.  Allows KeyboardInterrupt to occur
-# def joinAll(threads):
-#     while any(t.isAlive() for t in threads):
-#         for t in threads:
-#             t.join(0.2)
-
+ 
 class UR5ServoDriver(object):
     DISCONNECTED = 0
     IDLE = 1
