@@ -101,7 +101,6 @@ class UR5Connection(object):
     CONNECTED = 1
     READY_TO_PROGRAM = 2
     EXECUTING = 3
-    FREE_DRIVE = 4
     
     def __init__(self, hostname, port, program):
         self.__thread = None
@@ -254,9 +253,17 @@ def getConnectedRobot(wait=False, timeout=-1):
                 connected_robot_cond.wait(0.2)
         return connected_robot
 
-# Receives messages from the robot over the socket
+class TCPServer(SocketServer.TCPServer):
+    '''
+    Creates the Server for the robot
+    '''
+    allow_reuse_address = True  # Allows the program to restart gracefully on crash
+    timeout = 5
+    
 class CommanderTCPHandler(SocketServer.BaseRequestHandler):
-
+    '''
+    Receives messages from the robot over the socket
+    '''
     def recv_more(self):
         while True:
             r, _, _ = select.select([self.request], [], [], 0.2)
@@ -419,18 +426,12 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
     def get_tcp_state_as_euler(self):
         return self.last_tcp_state_as_euler
     
-# UTILITY FUNCTIONS ------------------------------------------------------------
-
-    
-class TCPServer(SocketServer.TCPServer):
-    allow_reuse_address = True  # Allows the program to restart gracefully on crash
-    timeout = 5
-
-# Waits until all threads have completed.  Allows KeyboardInterrupt to occur
-def joinAll(threads):
-    while any(t.isAlive() for t in threads):
-        for t in threads:
-            t.join(0.2)
+# THIS SEEMS TO BE UNUSED
+# # Waits until all threads have completed.  Allows KeyboardInterrupt to occur
+# def joinAll(threads):
+#     while any(t.isAlive() for t in threads):
+#         for t in threads:
+#             t.join(0.2)
 
 class UR5ServoDriver(object):
     DISCONNECTED = 0
@@ -492,6 +493,14 @@ class UR5ServoDriver(object):
             rospy.signal_shutdown("KeyboardInterrupt")
 
     def update(self):
+        # Robot is disconnected, this shouldnt really happen
+        if self.__mode == DISCONNECTED:
+            rospy.logerr('UR5 --> THE ROBOT IS DISCONNECTED')
+            pass
+        # Robot is idle, and therefore connected with program_reset loaded
+        elif self.__mode == IDLE:
+
+
         pass
 
     def load_programs(self):
@@ -604,7 +613,7 @@ class UR5ServoDriver(object):
         tmp = s.getsockname()[0]
         s.close()
         return tmp
-        
+
 # MAIN -------------------------------------------------------------------------
 # def main():  
 
