@@ -12,6 +12,7 @@ from BeautifulSoup import BeautifulSoup
 
 import rospy
 # import actionlib
+from std_msgs.msg import *
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryAction
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -471,6 +472,10 @@ class UR5ServoDriver(object):
         self.freedrive = False
 
 
+        self.status_pub = rospy.Publisher("/ur_driver/status",String)
+
+        self.status_pub.publish(String('IDLE'))
+
         rospy.logwarn('UR5 --> Loading Interfaces')
         # Subscribers
         self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.pose_cb)
@@ -479,8 +484,8 @@ class UR5ServoDriver(object):
         self.servoc_srv = rospy.Service('/ur_driver/servoc', ur_driver.srv.servoc, self.service_servoc)
         self.free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,self.service_free_drive)
         self.get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
-
         rospy.logwarn('UR5 --> Initializing')
+        
         # Set up UR5 parameters
         self.set_up_robot()
         # Load Programs
@@ -500,6 +505,7 @@ class UR5ServoDriver(object):
         try:
             while not rospy.is_shutdown():
                 self.update()
+                self.publish_status()
                 rospy.sleep(.1)
 
         # Shutdown (caught a ctrl-C)
@@ -513,6 +519,7 @@ class UR5ServoDriver(object):
                 else:
                     print 'No program found on robot... finished.'
                 self.connection.send_reset_program()
+                self.status_pub.publish(String('DISCONNECTED'))
             except:
                 pass
             rospy.signal_shutdown("KeyboardInterrupt")
@@ -679,10 +686,10 @@ class UR5ServoDriver(object):
         active = data.active
         if active == False:
             self.freedrive = False
-            return 'Freedrive disabled'
+            return 'DISABLED'
         else:
             self.freedrive = True
-            return 'Freedrive enabled'
+            return 'ENABLED'
     
     def load_joint_offsets(self,joint_names):
         robot_description = rospy.get_param("robot_description")
@@ -702,6 +709,20 @@ class UR5ServoDriver(object):
         tmp = s.getsockname()[0]
         s.close()
         return tmp
+
+    def publish_status(self):
+        m = ''
+        if self.__mode == 0:
+            m = 'DISCONNECTED' 
+        elif self.__mode == 1:
+            m = 'IDLE' 
+        elif self.__mode == 2:
+            m = 'SERVO' 
+        elif self.__mode == 3:
+            m = 'FREEDRIVE' 
+        elif self.__mode == 4:
+            m = 'TEST' 
+        self.status_pub.publish(String(m))
 
 if __name__ == '__main__':
     Servo = UR5ServoDriver()
