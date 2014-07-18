@@ -22,9 +22,9 @@ class URStatus(QWidget):
         super(URStatus,self).__init__()
         self.app_ = app
         self.setMinimumWidth(600)
-        self.setMinimumHeight(600)
+        self.setMinimumHeight(500)
         self.freedrive = False
-
+        self.status = 'DISCONNECTED'
 
         rospack = rospkg.RosPack()
         ui_path = rospack.get_path('ur_driver') + '/ur_status.ui'
@@ -92,7 +92,7 @@ class URStatus(QWidget):
         elif self.status == 'SERVO':
             self.status_label.setText(str(self.status))
             self.status_label.setStyleSheet('color:#ffffff; background-color:#AFEB1A')
-        elif self.status == 'FREEDRIVE':
+        elif self.status == 'TEACH':
             self.status_label.setText(str(self.status))
             self.status_label.setStyleSheet('color:#ffffff; background-color:#1AA5EB')
         elif self.status == 'DISCONNECTED':
