@@ -15,7 +15,7 @@ import rospy
 from sensor_msgs.msg import JointState
 from control_msgs.msg import FollowJointTrajectoryAction
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, PoseStamped
 from deserialize import RobotState, RobotMode
 
 import tf, PyKDL
@@ -457,6 +457,8 @@ class UR5ServoDriver(object):
     SERVO = 2
     FREEDRIVE = 3
     TEST = 4
+    default_vel = .1
+    default_acc = .1
 
     def __init__(self):
         rospy.logwarn('UR5 --> DRIVER STARTED')
@@ -471,7 +473,7 @@ class UR5ServoDriver(object):
 
         rospy.logwarn('UR5 --> Loading Interfaces')
         # Subscribers
-        self.pose_sub = rospy.Subscriber("/ur5_command_pose",Pose,self.pose_cb)
+        self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.pose_cb)
         # Services
         self.movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
         self.servoc_srv = rospy.Service('/ur_driver/servoc', ur_driver.srv.servoc, self.service_servoc)
@@ -628,34 +630,23 @@ class UR5ServoDriver(object):
         # self.init_tcp_state = self.robot.get_tcp_state() 
 
     def pose_cb(self,msg):
-        pose = msg.data
-        # try:
-        #     self.robot.send_servoj(999, setpoint.positions)
-        # except socket.error:
-        #     pass
+        target = msg.pose
+        if self.connected_robot: 
+            accel = self.default_acc
+            vel = self.default_vel
+            T = tf_c.fromMsg(target)
+            rot = T.M.GetEulerZYZ()
+            pose = list(T.p) + [rot[0], rot[1], rot[2]]
+            try:
+                self.connected_robot.send_servoc(0, pose, accel, vel)
+                print pose
+            except socket.error:
+                return 'FAILURE sending ' + str(pose)
 
     def service_movel(self,data):
         pass
 
     def service_servoc(self,data):
-
-        # rospy.logwarn('UR5 --> Mode switching to Test')
-        # # Quit the running program
-        # self.connected_robot = getConnectedRobot(wait=False)
-        # if self.connected_robot: 
-        #     print "Quitting Current Program"
-        #     connected_robot.send_quit()
-        # self.connect_to_robot(self.program_test)
-        # self.connection.send_program()
-        # self.set_mode(self.TEST)
-        # pass
-        
-        # print 'service servoc called'        
-        # accel = data.accel
-        # vel = data.vel
-        # self.connected_robot = getConnectedRobot(wait=False)
-        # self.connected_robot.send_servoc(0, [.15, -.619, .420, -.3957, 2.5184, -1.5332], accel, vel)
-
         print 'service servoc called'
         self.connected_robot = getConnectedRobot(wait=False)
         if self.connected_robot: 

@@ -143,7 +143,7 @@ def driverProg():
   end
 
   socket_open(HOSTNAME, 50001)
-  send_out("hello")
+  send_out("Robot Communicating Properly over PORT 50001")
 
   thread_state = run statePublisherThread()
   thread_tcp = run tcpStatePublisherThread()
