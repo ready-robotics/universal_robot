@@ -7,7 +7,7 @@ from control_msgs.msg import *
 from trajectory_msgs.msg import *
 from geometry_msgs.msg import *
 import PyKDL
-from ur_driver.srv import *
+import ur_driver; from ur_driver.srv import *
 import tf_conversions as tf_c
 
 if __name__ == '__main__':
@@ -15,6 +15,7 @@ if __name__ == '__main__':
 
     rospy.init_node("test_servo", anonymous=True, disable_signals=True)
 
+    print ''
     rospy.wait_for_service('/ur_driver/get_tcp_pose')
     try:
         tcp_service = rospy.ServiceProxy('/ur_driver/get_tcp_pose',get_tcp_pose)
@@ -22,40 +23,26 @@ if __name__ == '__main__':
         print str(result.current_pose)
         print str(result.current_euler)
         current_pose = result.current_pose
-        print tf_c.fromMsg(current_pose).M.GetRPY()
 
     except rospy.ServiceException, e:
         print e
 
-    rospy.sleep(1)
+    rospy.sleep(3)
     print ''
 
-    rospy.wait_for_service('/ur_driver/movel')
+    rospy.wait_for_service('/ur_driver/servoc')
     try:
-        movel_service = rospy.ServiceProxy('/ur_driver/movel',movel)
-        result = movel_service(current_pose)
+        servoc_prox = rospy.ServiceProxy('/ur_driver/servoc',servoc)
+
+        pose = current_pose
+        pose.position.z += .1
+
+        msg = ur_driver.srv.servocRequest()
+        msg.target = pose
+        msg.accel = .1
+        msg.vel = .05
+
+        result = servoc_prox(msg)
         print str(result.ack)
     except rospy.ServiceException, e:
         print e
-
-    rospy.sleep(1)
-
-    rospy.wait_for_service('/ur_driver/free_drive')
-    try:
-        free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
-        result = free_drive_service(True)
-        print str(result.ack)
-    except rospy.ServiceException, e:
-        print e
-
-    rospy.sleep(9)
-
-    rospy.wait_for_service('/ur_driver/free_drive')
-    try:
-        free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
-        result = free_drive_service(False)
-        print str(result.ack)
-    except rospy.ServiceException, e:
-        print e
-
-

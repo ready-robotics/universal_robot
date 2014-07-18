@@ -34,6 +34,7 @@ add_service_files(
   free_drive.srv
   get_tcp_pose.srv
   movel.srv
+  servoc.srv
 )
 
 # Generate added messages and services with any dependencies listed here

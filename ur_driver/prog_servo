@@ -146,7 +146,7 @@ def driverProg():
   send_out("hello")
 
   thread_state = run statePublisherThread()
-  thread_tcpstate = run tcpStatePublisherThread()
+  thread_tcp = run tcpStatePublisherThread()
   thread_servo = run servoThread()
 
   # Servoes in a circle
@@ -173,16 +173,17 @@ def driverProg():
       send_out("Received too many things")
     else:
       mtype = ll[1]
+
       if mtype == MSG_QUIT:
         send_out("Received QUIT")
         break
+
       elif mtype == MSG_MOVEJ:
         send_out("Received movej")
         params_mult = socket_read_binary_integer(1+6+4)
         if params_mult[0] == 0:
           send_out("Received no parameters for movej message")
         end
-
         # Unpacks the parameters
         waypoint_id = params_mult[1]
         q = [params_mult[2] / MULT_jointstate,
@@ -195,19 +196,18 @@ def driverProg():
         v = params_mult[9] / MULT_jointstate
         t = params_mult[10] / MULT_time
         r = params_mult[11] / MULT_blend
-
         # Sends the command
         send_out("movej started")
         movej(q, a, v, t, r)
         send_waypoint_finished(waypoint_id)
         send_out("movej finished")
+
       elif mtype == MSG_SERVOJ:
         # Reads the parameters
         params_mult = socket_read_binary_integer(1+6+1)
         if params_mult[0] == 0:
           send_out("Received no parameters for movej message")
         end
-
         # Unpacks the parameters
               waypoint_id = params_mult[1]
         q = [params_mult[2] / MULT_jointstate,
@@ -217,18 +217,17 @@ def driverProg():
                    params_mult[6] / MULT_jointstate,
                    params_mult[7] / MULT_jointstate]
         t = params_mult[8] / MULT_time
-
         # Servos
         #servoj(q, 3, 0.1, t)
         #send_waypoint_finished(waypoint_id)
-        set_servo_setpoint(waypoint_id, q, t)
+        # set_servo_setpoint(waypoint_id, q, t)
+
       elif mtype == MSG_MOVEL:
         send_out("Received movel")
         params_mult = socket_read_binary_integer(1+6+7)
         if params_mult[0] == 0:
           send_out("Received no parameters for movel message")
         end
-
         # Unpacks the parameters
         waypoint_id = params_mult[1]
         pose = [params_mult[2] / MULT_jointstate,
@@ -239,14 +238,42 @@ def driverProg():
                    params_mult[7] / MULT_jointstate]
         a = params_mult[8] / MULT_jointstate
         v = params_mult[9] / MULT_jointstate
-        t = params_mult[10] / MULT_time
-        r = params_mult[11] / MULT_blend
-
+        #t = params_mult[10] / MULT_time
+        #r = params_mult[11] / MULT_blend
         # Sends the command
         send_out("movel started")
-        movel(pose, a, v, t, r)
+        movel(pose, a, v, 0, 0)
+        textmsg(pose)
+        textmsg(a)
+        textmsg(v)
         send_waypoint_finished(waypoint_id)
-        send_out("movej finished")
+        send_out("movel finished")
+
+      elif mtype == MSG_SERVOC:
+        send_out("Received servoc")
+        params_mult = socket_read_binary_integer(1+6+2)
+        if params_mult[0] == 0:
+          send_out("Received no parameters for servoc message")
+        end
+        # Unpacks the parameters
+        waypoint_id = params_mult[1]
+        pose = [params_mult[2] / MULT_jointstate,
+                   params_mult[3] / MULT_jointstate,
+                   params_mult[4] / MULT_jointstate,
+                   params_mult[5] / MULT_jointstate,
+                   params_mult[6] / MULT_jointstate,
+                   params_mult[7] / MULT_jointstate]
+        acc = params_mult[8] / MULT_jointstate
+        vel = params_mult[9] / MULT_jointstate
+        # Sends the command
+        send_out("servoc started")
+        textmsg(pose)
+        textmsg(acc)
+        textmsg(vel)
+        servoc(p[pose[0],pose[1],pose[2],pose[3],pose[4],pose[5]], a=acc, v=vel, r=0)
+        send_waypoint_finished(waypoint_id)
+        send_out("servoc finished")
+
       elif mtype == MSG_STOPJ:
         send_out("Received stopj")
         stopj(1.0)
@@ -258,6 +285,8 @@ def driverProg():
 
   #sleep(1)
   kill thread_state
+  kill thread_servo
+  kill thread_tcp
   socket_send_int(MSG_QUIT)
 end
 driverProg()
