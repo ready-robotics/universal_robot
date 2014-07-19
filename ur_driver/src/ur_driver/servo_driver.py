@@ -484,8 +484,11 @@ class UR5ServoDriver(object):
         self.servoc_srv = rospy.Service('/ur_driver/servoc', ur_driver.srv.servoc, self.service_servoc)
         self.free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,self.service_free_drive)
         self.get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
+        self.servo_enable_srv = rospy.Service('/ur_driver/servo_enable', ur_driver.srv.servo_enable, self.service_servo_enable)
+        self.home_srv = rospy.Service('/ur_driver/home', ur_driver.srv.home, self.service_home)
+
         rospy.logwarn('UR5 --> Initializing')
-        
+
         # Set up UR5 parameters
         self.set_up_robot()
         # Load Programs
@@ -531,16 +534,17 @@ class UR5ServoDriver(object):
             pass
         # Robot is idle, and therefore connected with program_reset loaded
         elif self.__mode == self.IDLE:
-            rospy.logwarn('UR5 --> Mode switching to SERVO')
-            # Quit the running program
-            self.connected_robot = getConnectedRobot(wait=False)
-            if self.connected_robot: 
-                print "Quitting Current Program"
-                connected_robot.send_quit()
-            self.connect_to_robot(self.program_servo)
-            self.connection.send_program()
-            rospy.logwarn('UR5 --> Sent default program to robot... running.')
-            self.set_mode(self.SERVO)
+            if self.servo_enabled == True:
+                rospy.logwarn('UR5 --> Mode switching to SERVO')
+                # Quit the running program
+                self.connected_robot = getConnectedRobot(wait=False)
+                if self.connected_robot: 
+                    print "Quitting Current Program"
+                    connected_robot.send_quit()
+                self.connect_to_robot(self.program_servo)
+                self.connection.send_program()
+                rospy.logwarn('UR5 --> Sent default program to robot... running.')
+                self.set_mode(self.SERVO)
         # Currently in servo mode
         elif self.__mode == self.SERVO:
             # Check for Freedrive enable
@@ -691,6 +695,20 @@ class UR5ServoDriver(object):
             self.freedrive = True
             return 'ENABLED'
     
+    def service_home(self,msg):
+        pass
+
+    def service_servo_enable(self,msg):
+        enable = msg.req
+        if enable == True:
+            if self.__mode == self.SERVO:
+
+            else:
+                self.servo_enabled = True
+        else:
+            pass
+
+        
     def load_joint_offsets(self,joint_names):
         robot_description = rospy.get_param("robot_description")
         soup = BeautifulSoup(robot_description)
