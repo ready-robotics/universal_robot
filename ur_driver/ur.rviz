@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /Grid1
+        - /InteractiveMarkers1
       Splitter Ratio: 0.5
     Tree Height: 478
   - Class: rviz/Selection
@@ -104,10 +105,19 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /interactive_transform_publisher/target_frame/update
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -128,22 +138,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.48575
+      Distance: 1.85868
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.218904
-        Y: 0.226155
-        Z: 0.228417
+        X: -0.0800453
+        Y: -0.306174
+        Z: 0.0610948
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.319797
+      Pitch: 0.629797
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.78041
+      Yaw: 5.47545
     Saved: ~
 Window Geometry:
   Displays:

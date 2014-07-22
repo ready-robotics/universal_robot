@@ -21,6 +21,7 @@ from deserialize import RobotState, RobotMode
 
 import tf, PyKDL
 import tf_conversions as tf_c
+import numpy as np
 
 import ur_driver
 from ur_driver.srv import *
@@ -363,15 +364,19 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
                     state_mult = struct.unpack_from("!%ii" % (1*6), buf, 0)
                     buf = buf[1*6*4:]
                     state = [s / MULT_jointstate for s in state_mult]
-                    self.last_tcp_state_as_euler = state
-
+                    # Create Frame from XYZ and Angle Axis
                     T = PyKDL.Frame()
+                    p = PyKDL.Vector(state[0],state[1],state[2])
+                    axis = PyKDL.Vector(state[3],state[4],state[5])
+                    # Get norm and normalized axis
+                    angle = axis.Normalize()
+                    # Make frame
                     T.p = PyKDL.Vector(state[0],state[1],state[2])
-                    T.M = PyKDL.Rotation.EulerZYZ(state[3],state[4],state[5])
-                    # print state
-                    # print T.M.GetRPY()
+                    T.M = PyKDL.Rotation.Rot(axis,angle)
+                    # Create Pose
                     tcp_pose = tf_c.toMsg(T)
-                    # rospy.logwarn(str(tcp_pose))
+                    # Save
+                    self.last_tcp_state_as_angle_axis = state
                     self.last_tcp_state = tcp_pose
                 elif mtype == MSG_QUIT:
                     print "Quitting"
@@ -428,7 +433,7 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
         '''
         assert(len(pose) == 6)
         pose_robot = pose
-        params = [MSG_MOVEL, waypoint_id] + [MULT_jointstate * pp for pp in pose_robot] + [MULT_jointstate * accel, MULT_jointstate * vel]
+        params = [MSG_MOVEL, 999] + [MULT_jointstate * pp for pp in pose_robot] + [MULT_jointstate * accel, MULT_jointstate * vel]
         buf = struct.pack("!%ii" % len(params), *params)
         with self.socket_lock:
             self.request.send(buf)
@@ -447,8 +452,8 @@ class CommanderTCPHandler(SocketServer.BaseRequestHandler):
     def get_tcp_state(self):
         return self.last_tcp_state
 
-    def get_tcp_state_as_euler(self):
-        return self.last_tcp_state_as_euler
+    def get_tcp_axis_angle(self):
+        return self.last_tcp_state_as_angle_axis
 
 # SERVO DRIVER ----------------------------------------------------------------#
 
@@ -458,8 +463,8 @@ class UR5ServoDriver(object):
     SERVO = 2
     FREEDRIVE = 3
     TEST = 4
-    default_vel = .1
-    default_acc = .1
+    default_vel = .2
+    default_acc = .7
 
     def __init__(self):
         rospy.logwarn('UR5 --> DRIVER STARTED')
@@ -470,6 +475,8 @@ class UR5ServoDriver(object):
         self.connection = None
         self.__mode = self.DISCONNECTED
         self.freedrive = False
+        self.servo_enabled = True
+        self.last_commanded_pose = None
 
 
         self.status_pub = rospy.Publisher("/ur_driver/status",String)
@@ -486,6 +493,7 @@ class UR5ServoDriver(object):
         self.get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
         self.servo_enable_srv = rospy.Service('/ur_driver/servo_enable', ur_driver.srv.servo_enable, self.service_servo_enable)
         self.home_srv = rospy.Service('/ur_driver/home', ur_driver.srv.home, self.service_home)
+        self.stop_srv = rospy.Service('/ur_driver/stop', ur_driver.srv.stop, self.service_stop)
 
         rospy.logwarn('UR5 --> Initializing')
 
@@ -522,6 +530,9 @@ class UR5ServoDriver(object):
                 else:
                     print 'No program found on robot... finished.'
                 self.connection.send_reset_program()
+                print 'Sent reset program'
+                self.connection.disconnect()
+                print 'Disconnected on purpose'
                 self.status_pub.publish(String('DISCONNECTED'))
             except:
                 pass
@@ -646,16 +657,38 @@ class UR5ServoDriver(object):
             accel = self.default_acc
             vel = self.default_vel
             T = tf_c.fromMsg(target)
-            rot = T.M.GetEulerZYZ()
-            pose = list(T.p) + [rot[0], rot[1], rot[2]]
-            try:
-                self.connected_robot.send_servoc(0, pose, accel, vel)
-                print pose
-            except socket.error:
-                return 'FAILURE sending ' + str(pose)
+            a,axis = T.M.GetRotAngle()
+            pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
+            current_pose = self.connected_robot.get_tcp_axis_angle()
+            
+            # print '--- Current Pose ---'
+            # print self.connected_robot.get_tcp_axis_angle()
+            # print '--- COMMANDED POSE ---'
+            # print pose
+
+            if pose != self.last_commanded_pose:
+                try:
+                    # Command pose to robot
+                    print 'Sending Pose'
+                    self.connected_robot.send_movel(0, pose, accel, vel)
+                    self.last_commanded_pose = pose
+                except socket.error:
+                    rospy.logerr('FAILURE sending ' + str(pose))
+            else:
+                pass
+                # print 'Duplicate pose... not sent'
 
     def service_movel(self,data):
         pass
+
+    def check_distance(self,a,b,val):
+        v1 = np.array(a)
+        v2 = np.array(b)
+        res = np.sum(np.abs(np.subtract(v1,v2)))
+        if res < val:
+            return True
+        else:
+            return False
 
     def service_servoc(self,data):
         print 'service servoc called'
@@ -665,8 +698,8 @@ class UR5ServoDriver(object):
             accel = data.accel
             vel = data.vel
             T = tf_c.fromMsg(target)
-            rot = T.M.GetEulerZYZ()
-            pose = list(T.p) + [rot[0], rot[1], rot[2]]
+            a,axis = T.M.GetRotAngle()
+            pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
             try:
                 self.connected_robot.send_servoc(0, pose, accel, vel)
                 return str(pose)
@@ -681,7 +714,7 @@ class UR5ServoDriver(object):
         if self.connected_robot: 
             resp = ur_driver.srv.get_tcp_poseResponse()
             resp.current_pose = self.connected_robot.get_tcp_state()
-            resp.current_euler = self.connected_robot.get_tcp_state_as_euler()
+            resp.current_euler = self.connected_robot.get_tcp_axis_angle()
             return resp
         else:
             return 'No Robot Available'
@@ -698,11 +731,23 @@ class UR5ServoDriver(object):
     def service_home(self,msg):
         pass
 
+    def service_stop(self,msg):
+        if self.__mode == self.SERVO:
+            self.connected_robot = getConnectedRobot(wait=False)
+            if self.connected_robot:
+                # self.connected_robot.send_stopj() 
+                return 'SUCCESS'
+            else:
+                return 'No connected robot'
+        else:
+            return 'Not in servo mode'
+
+
     def service_servo_enable(self,msg):
         enable = msg.req
         if enable == True:
             if self.__mode == self.SERVO:
-
+                pass
             else:
                 self.servo_enabled = True
         else:

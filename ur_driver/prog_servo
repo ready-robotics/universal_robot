@@ -224,7 +224,7 @@ def driverProg():
 
       elif mtype == MSG_MOVEL:
         send_out("Received movel")
-        params_mult = socket_read_binary_integer(1+6+7)
+        params_mult = socket_read_binary_integer(1+6+2)
         if params_mult[0] == 0:
           send_out("Received no parameters for movel message")
         end
@@ -236,16 +236,14 @@ def driverProg():
                    params_mult[5] / MULT_jointstate,
                    params_mult[6] / MULT_jointstate,
                    params_mult[7] / MULT_jointstate]
-        a = params_mult[8] / MULT_jointstate
-        v = params_mult[9] / MULT_jointstate
-        #t = params_mult[10] / MULT_time
-        #r = params_mult[11] / MULT_blend
+        acc = params_mult[8] / MULT_jointstate
+        vel = params_mult[9] / MULT_jointstate
         # Sends the command
         send_out("movel started")
-        movel(pose, a, v, 0, 0)
-        textmsg(pose)
-        textmsg(a)
-        textmsg(v)
+        # textmsg(pose)
+        # textmsg(acc)
+        # textmsg(vel)
+        movel(p[pose[0],pose[1],pose[2],pose[3],pose[4],pose[5]], a=acc, v=vel, t=0, r=0)
         send_waypoint_finished(waypoint_id)
         send_out("movel finished")
 
@@ -267,9 +265,9 @@ def driverProg():
         vel = params_mult[9] / MULT_jointstate
         # Sends the command
         send_out("servoc started")
-        textmsg(pose)
-        textmsg(acc)
-        textmsg(vel)
+        # textmsg(pose)
+        # textmsg(acc)
+        # textmsg(vel)
         servoc(p[pose[0],pose[1],pose[2],pose[3],pose[4],pose[5]], a=acc, v=vel, r=0)
         send_waypoint_finished(waypoint_id)
         send_out("servoc finished")

@@ -35,6 +35,9 @@ add_service_files(
   get_tcp_pose.srv
   movel.srv
   servoc.srv
+  servo_enable.srv
+  home.srv
+  stop.srv
 )
 
 # Generate added messages and services with any dependencies listed here
