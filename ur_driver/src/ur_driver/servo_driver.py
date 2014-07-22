@@ -742,7 +742,6 @@ class UR5ServoDriver(object):
         else:
             return 'Not in servo mode'
 
-
     def service_servo_enable(self,msg):
         enable = msg.req
         if enable == True:
@@ -752,7 +751,6 @@ class UR5ServoDriver(object):
                 self.servo_enabled = True
         else:
             pass
-
         
     def load_joint_offsets(self,joint_names):
         robot_description = rospy.get_param("robot_description")
@@ -787,5 +785,6 @@ class UR5ServoDriver(object):
             m = 'TEST' 
         self.status_pub.publish(String(m))
 
+# MAIN ------------------------------------------------------------------------#
 if __name__ == '__main__':
     Servo = UR5ServoDriver()

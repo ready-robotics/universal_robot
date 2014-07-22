@@ -17,13 +17,10 @@ import tf; from tf import *
 import tf_conversions as tf_c
 import rospkg
 
-
 class URStatus(QWidget):
     def __init__(self,app):
         super(URStatus,self).__init__()
         self.app_ = app
-        self.setMinimumWidth(600)
-        self.setMinimumHeight(500)
         self.freedrive = False
         self.status = 'DISCONNECTED'
         self.servo_to_target = False
@@ -36,8 +33,13 @@ class URStatus(QWidget):
         self.show()
 
         self.target_pub = rospy.Publisher('/ur5_command_pose',PoseStamped)
-
         self.status_sub = rospy.Subscriber('/ur_driver/status',String,self.status_cb)
+
+        # Load Settings
+        self.settings = QSettings('settings.ini', QSettings.IniFormat)
+        self.settings.setFallbacksEnabled(False) 
+        self.resize( self.settings.value('size', QSize(600, 500), type=QSize) )
+        self.move(self.settings.value('pos', QPoint(50, 50), type=QPoint))
 
         # Set up ros_ok watchdog timer to handle termination and ctrl-c
         self.ok_timer_ = QTimer(self)
@@ -61,15 +63,11 @@ class URStatus(QWidget):
                     T_target = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
                     self.target_pose = tf_c.toMsg(T_target)
 
-                    # rospy.logwarn(self.target_pose)
-                    # rospy.logwarn(self.initial_pose)
-
                     cmd = PoseStamped()
                     cmd.pose.position = self.target_pose.position
                     cmd.pose.orientation = self.initial_pose.orientation
 
                     self.target_pub.publish(cmd)
-                    # rospy.logwarn('Sent command to robot')
 
                     if self.single_move == True:
                         self.servo_to_target = False
@@ -106,9 +104,13 @@ class URStatus(QWidget):
         if val == 2:
             rospy.logwarn('Single Servo Enabled')
             self.single_move = True
+            self.status_label.setText('SERVO TO POSE')
+            self.status_label.setStyleSheet('background-color:#00E39F;color:#ffffff')
         elif val == 0:
             rospy.logwarn('Single Servo Disabled')
             self.single_move = False
+            self.status_label.setText('IDLE')
+            self.status_label.setStyleSheet('background-color:#BFC983;color:#ffffff')
 
     def freedrive_enable(self):
         print 'Enabling Freedrive...'
@@ -154,17 +156,17 @@ class URStatus(QWidget):
 
     def check_status(self):
         if self.status == 'IDLE':
-            self.status_label.setText(str(self.status))
-            self.status_label.setStyleSheet('color:#ffffff; background-color:#EBCF1A')
+            self.mode_label.setText(str(self.status))
+            self.mode_label.setStyleSheet('color:#ffffff; background-color:#EBCF1A')
         elif self.status == 'SERVO':
-            self.status_label.setText(str(self.status))
-            self.status_label.setStyleSheet('color:#ffffff; background-color:#AFEB1A')
+            self.mode_label.setText(str(self.status))
+            self.mode_label.setStyleSheet('color:#ffffff; background-color:#AFEB1A')
         elif self.status == 'TEACH':
-            self.status_label.setText(str(self.status))
-            self.status_label.setStyleSheet('color:#ffffff; background-color:#1AA5EB')
+            self.mode_label.setText(str(self.status))
+            self.mode_label.setStyleSheet('color:#ffffff; background-color:#1AA5EB')
         elif self.status == 'DISCONNECTED':
-            self.status_label.setText(str(self.status))
-            self.status_label.setStyleSheet('color:#ffffff; background-color:#EB1A1D')
+            self.mode_label.setText(str(self.status))
+            self.mode_label.setStyleSheet('color:#ffffff; background-color:#EB1A1D')
 
     def get_tcp_pose(self):
         rospy.wait_for_service('/ur_driver/get_tcp_pose')
@@ -188,22 +190,17 @@ class URStatus(QWidget):
 # Widget Functions ------------------------------------------------------------#
 
     def closeEvent(self, event):
-        # Finish up if needed
+        print 'saving info'
+        self.settings.setValue('size', self.size())
+        self.settings.setValue('pos', self.pos())
+        self.settings.sync()
         event.accept()
-
-    def clean_up(self):
-        # Do some clean up here
-        pass
 
     def check_ok(self):
         self.check_status()
         if rospy.is_shutdown():
-            self.clean_up()
             self.close()
             self.app_.exit()
-
-
-
 
 # MAIN #########################################################################
 if __name__ == '__main__':
