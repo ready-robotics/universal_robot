@@ -463,8 +463,8 @@ class UR5ServoDriver(object):
     SERVO = 2
     FREEDRIVE = 3
     TEST = 4
-    default_vel = .2
-    default_acc = .7
+    default_vel = .1
+    default_acc = .5
 
     def __init__(self):
         rospy.logwarn('UR5 --> DRIVER STARTED')
@@ -517,6 +517,7 @@ class UR5ServoDriver(object):
             while not rospy.is_shutdown():
                 self.update()
                 self.publish_status()
+                self.debug()
                 rospy.sleep(.1)
 
         # Shutdown (caught a ctrl-C)
@@ -660,11 +661,6 @@ class UR5ServoDriver(object):
             a,axis = T.M.GetRotAngle()
             pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
             current_pose = self.connected_robot.get_tcp_axis_angle()
-            
-            # print '--- Current Pose ---'
-            # print self.connected_robot.get_tcp_axis_angle()
-            # print '--- COMMANDED POSE ---'
-            # print pose
 
             if pose != self.last_commanded_pose:
                 try:
@@ -677,6 +673,16 @@ class UR5ServoDriver(object):
             else:
                 pass
                 # print 'Duplicate pose... not sent'
+
+    def debug(self):
+        self.connected_robot = getConnectedRobot(wait=False)
+        if self.connected_robot:
+            if self.last_commanded_pose: 
+                if not self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
+                    self.servoing_to_position = True
+                    print 'servoing to position'
+                else:
+                    self.servoing_to_position = False
 
     def service_movel(self,data):
         pass
