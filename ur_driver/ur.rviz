@@ -4,10 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
-        - /Grid1
-        - /InteractiveMarkers1
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 478
   - Class: rviz/Selection
@@ -114,6 +112,66 @@ Visualization Manager:
       Show Visual Aids: false
       Update Topic: /interactive_transform_publisher/target_frame/update
       Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        base_link:
+          Value: true
+        ee_link:
+          Value: true
+        endpoint:
+          Value: true
+        endpoint_calc:
+          Value: true
+        endpoint_reported:
+          Value: true
+        forearm_link:
+          Value: true
+        shoulder_link:
+          Value: true
+        target_frame:
+          Value: true
+        upper_arm_link:
+          Value: true
+        ur_base:
+          Value: true
+        world:
+          Value: true
+        wrist_1_link:
+          Value: true
+        wrist_2_link:
+          Value: true
+        wrist_3_link:
+          Value: true
+      Marker Scale: 0.5
+      Name: TF
+      Show Arrows: false
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          base_link:
+            shoulder_link:
+              upper_arm_link:
+                forearm_link:
+                  wrist_1_link:
+                    wrist_2_link:
+                      wrist_3_link:
+                        ee_link:
+                          {}
+            ur_base:
+              endpoint:
+                {}
+          endpoint_calc:
+            {}
+          endpoint_reported:
+            {}
+          target_frame:
+            {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -138,22 +196,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.85868
+      Distance: 1.60241
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0800453
-        Y: -0.306174
-        Z: 0.0610948
+        X: -0.0792366
+        Y: -0.602109
+        Z: 1.28271
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.629797
+      Pitch: 0.750202
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.47545
+      Yaw: 5.37044
     Saved: ~
 Window Geometry:
   Displays:
@@ -171,5 +229,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1246
-  X: 648
-  Y: 39
+  X: 609
+  Y: 73

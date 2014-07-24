@@ -486,6 +486,8 @@ class UR5ServoDriver(object):
         rospy.logwarn('UR5 --> Loading Interfaces')
         # Subscribers
         self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.servo_pose_cb)
+        # TF
+        self.broadcaster = tf.TransformBroadcaster()
         # Services
         self.movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
         self.servo_to_pose_srv = rospy.Service('/ur_driver/servo_to_pose', ur_driver.srv.servo_to_pose, self.service_servo_to_pose)
@@ -693,6 +695,12 @@ class UR5ServoDriver(object):
     def debug(self):
         self.connected_robot = getConnectedRobot(wait=False)
         if self.connected_robot:
+            pose = self.connected_robot.get_tcp_state()
+            if pose:
+                F = tf_c.fromMsg(pose)
+                # print connected_robot.get_tcp_axis_angle()
+                self.broadcaster.sendTransform(tuple(F.p),tuple(F.M.GetQuaternion()),rospy.Time.now(), '/endpoint','/ur_base')
+
             if self.last_commanded_pose: 
                 if not self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
                     self.servoing_to_position = True
@@ -714,7 +722,18 @@ class UR5ServoDriver(object):
             return False
 
     def service_servo_to_pose(self,data):
-        print 'service servoc called'
+        # print 'service servoc called'
+        target = data.target # target is a Pose
+        accel = data.accel
+        vel = data.vel
+        T = tf_c.fromMsg(target)
+        a,axis = T.M.GetRotAngle()
+        pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
+        print 'desired:'
+        print pose
+        print 'current:'
+        print self.connected_robot.get_tcp_axis_angle()
+
         if self.__mode == self.SERVO:
             self.connected_robot = getConnectedRobot(wait=False)
             if self.connected_robot: 
@@ -739,7 +758,7 @@ class UR5ServoDriver(object):
             return 'SERVO DISABLED'
 
     def service_get_tcp_pose(self,data):
-        print 'service get_tcp_pose called'
+        # print 'service get_tcp_pose called'
         self.connected_robot = getConnectedRobot(wait=False)
         if self.connected_robot: 
             resp = ur_driver.srv.get_tcp_poseResponse()
