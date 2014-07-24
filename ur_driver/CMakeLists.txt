@@ -34,7 +34,7 @@ add_service_files(
   free_drive.srv
   get_tcp_pose.srv
   movel.srv
-  servoc.srv
+  servo_to_pose.srv
   servo_enable.srv
   home.srv
   stop.srv

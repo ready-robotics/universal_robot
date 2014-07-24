@@ -22,9 +22,10 @@ class URStatus(QWidget):
         super(URStatus,self).__init__()
         self.app_ = app
         self.freedrive = False
-        self.servo = False
         self.status = 'DISCONNECTED'
+        self.servo_to_target = False
         self.listener_ = TransformListener()
+        self.single_move = False
 
         rospack = rospkg.RosPack()
         ui_path = rospack.get_path('ur_driver') + '/ur_status.ui'
@@ -49,10 +50,32 @@ class URStatus(QWidget):
         self.connect(self.update_timer_, QtCore.SIGNAL("timeout()"),self.update)
         self.update_timer_.start(100)
 
-        self.freedrive_enable_btn.clicked.connect(self.freedrive_enable)
-        self.freedrive_disable_btn.clicked.connect(self.freedrive_disable)
+        self.enable_btn.clicked.connect(self.freedrive_enable)
+        self.disable_btn.clicked.connect(self.freedrive_disable)
         self.servo_enable_btn.clicked.connect(self.servo_enable)
         self.servo_disable_btn.clicked.connect(self.servo_disable)
+        self.single_servo_check.stateChanged.connect(self.servo_mode_changed)
+
+    def update(self):
+        if self.servo_to_target == True:
+            if self.status == 'SERVO':
+                try:
+                    T_target = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
+                    self.target_pose = tf_c.toMsg(T_target)
+
+                    cmd = PoseStamped()
+                    cmd.pose.position = self.target_pose.position
+                    cmd.pose.orientation = self.initial_pose.orientation
+
+                    self.target_pub.publish(cmd)
+
+                    if self.single_move == True:
+                        self.servo_to_target = False
+
+                except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
+                    rospy.logwarn(str(e))
+            else:
+                rospy.logwarn('Not in servo mode')
 
     def status_cb(self,msg):
         self.status = msg.data
@@ -60,78 +83,59 @@ class URStatus(QWidget):
     def servo_enable(self):
         rospy.logwarn('enabling servo')
         if self.freedrive == False:
-            if self.servo == False:
-                try:
-                    rospy.wait_for_service('/ur_driver/servo_enable',2)
-                except rospy.ROSException as e:
-                    print 'Could not find servo_enable service'
-                    self.msg_label.setText("NO SERVO_ENABLE SERVICE")
+            if not self.servo_to_target:
+                self.initial_pose = self.get_tcp_pose()
+                # rospy.logwarn(self.initial_pose)
+                if not self.initial_pose:
+                    rospy.logerr('There was a problem getting the initial pose')
                     return
-                try:
-                    servo_enable_service = rospy.ServiceProxy('/ur_driver/servo_enable',servo_enable)
-                    result = servo_enable_service(True)
-                    self.servo = True
-                    self.servo_enable_label.setText('ENABLED')
-                    self.servo_enable_label.setStyleSheet('color:#ffffff;background-color:#ADE817')
-                    self.msg_label.setText("SERVO ENABLED")
-                except rospy.ServiceException, e:
-                    print e
-            else:
-                self.msg_label.setText('SERVO ALREAD ENABLED')
-        else:
-            self.msg_label.setText("CANT SERVO, FREEDRIVE ENABLED")
+                else:
+                    self.servo_to_target = True
+                    return
 
     def servo_disable(self):
         rospy.logwarn('disabling servo')
-        if self.freedrive == False:
-            if self.servo == True:
-                    try:
-                        rospy.wait_for_service('/ur_driver/servo_enable',2)
-                    except rospy.ROSException as e:
-                        print 'Could not find servo_enable service'
-                        self.msg_label.setText("NO SERVO_ENABLE SERVICE")
-                        return
-                    try:
-                        servo_enable_service = rospy.ServiceProxy('/ur_driver/servo_enable',servo_enable)
-                        result = servo_enable_service(False)
-                        self.servo = False
-                        self.servo_enable_label.setText('DISABLED')
-                        self.servo_enable_label.setStyleSheet('color:#ffffff;background-color:#FF9100')
-                        self.msg_label.setText("SERVO DISABLED")
-                    except rospy.ServiceException, e:
-                        print e
-            else:
-                 self.msg_label.setText("SERVO IS NOT ENABLED")  
-            # r = self.stop_robot()
-            # rospy.logwarn("Stop Robot Result: " + str(r))
-        else:
-            self.msg_label.setText("CANT DISABLE SERVO, FREEDRIVE ENABLED")
+        self.servo_to_target = False
+        self.initial_pose = None
+        r = self.stop_robot()
+        rospy.logwarn("Stop Robot Result: " + str(r))
+
+    def servo_mode_changed(self,val):
+        if val == 2:
+            rospy.logwarn('Single Servo Enabled')
+            self.single_move = True
+            self.status_label.setText('SERVO TO POSE')
+            self.status_label.setStyleSheet('background-color:#00E39F;color:#ffffff')
+        elif val == 0:
+            rospy.logwarn('Single Servo Disabled')
+            self.single_move = False
+            self.status_label.setText('IDLE')
+            self.status_label.setStyleSheet('background-color:#BFC983;color:#ffffff')
 
     def freedrive_enable(self):
-        rospy.logwarn('enabling freedrive')
-        if self.servo == False:
-            if self.freedrive == False:
-                try:
-                    rospy.wait_for_service('/ur_driver/free_drive',2)
-                except rospy.ROSException as e:
-                    print 'Could not find freedrive service'
-                    return
-                try:
-                    free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
-                    result = free_drive_service(True)
-                    # print 'Service returned: ' + str(result.ack)
-                    self.freedrive = True
-                    self.freedrive_enable_label.setText('ENABLED')
-                    self.freedrive_enable_label.setStyleSheet('color:#ffffff;background-color:#ADE817')
-                    self.msg_label.setText("FREEDRIVE ENABLED")
-                except rospy.ServiceException, e:
-                    print e
-            else:
-                self.msg_label.setText("FREEDRIVE IS ALREADY ENABLED")
+        print 'Enabling Freedrive...'
+        # Always disable servoing
+        self.servo_to_target = False
+        if self.freedrive == False:
+            try:
+                rospy.wait_for_service('/ur_driver/free_drive',2)
+            except rospy.ROSException as e:
+                print 'Could not find freedrive service'
+                return
+            try:
+                free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
+                result = free_drive_service(True)
+                print 'Service returned: ' + str(result.ack)
+                self.freedrive = True
+                self.enable_label.setText('ENABLED')
+                self.enable_label.setStyleSheet('color:#ffffff;background-color:#ADE817')
+            except rospy.ServiceException, e:
+                print e
         else:
-            self.msg_label.setText("CANT FREEDRIVE, SERVO ENABLED")
+            print 'Freedrive is already enabled'
 
     def freedrive_disable(self):
+        print 'Disabling Freedrive...'
         if self.freedrive == True:
             try:
                 rospy.wait_for_service('/ur_driver/free_drive',2)
@@ -141,11 +145,10 @@ class URStatus(QWidget):
             try:
                 free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
                 result = free_drive_service(False)
-                # print 'Service returned: ' + str(result.ack)
+                print 'Service returned: ' + str(result.ack)
                 self.freedrive = False
-                self.freedrive_enable_label.setText('DISABLED')
-                self.freedrive_enable_label.setStyleSheet('color:#ffffff;background-color:#FF9100')
-                self.msg_label.setText("FREEDRIVE DISABLED")
+                self.enable_label.setText('DISABLED')
+                self.enable_label.setStyleSheet('color:#ffffff;background-color:#FF9100')
             except rospy.ServiceException, e:
                 print e
         else:
@@ -158,15 +161,22 @@ class URStatus(QWidget):
         elif self.status == 'SERVO':
             self.mode_label.setText(str(self.status))
             self.mode_label.setStyleSheet('color:#ffffff; background-color:#AFEB1A')
-        elif self.status == 'SERVO IDLE':
-            self.mode_label.setText(str(self.status))
-            self.mode_label.setStyleSheet('color:#ffffff; background-color:#B9C49B')
         elif self.status == 'TEACH':
             self.mode_label.setText(str(self.status))
             self.mode_label.setStyleSheet('color:#ffffff; background-color:#1AA5EB')
         elif self.status == 'DISCONNECTED':
             self.mode_label.setText(str(self.status))
             self.mode_label.setStyleSheet('color:#ffffff; background-color:#EB1A1D')
+
+    def get_tcp_pose(self):
+        rospy.wait_for_service('/ur_driver/get_tcp_pose')
+        try:
+            tcp_service = rospy.ServiceProxy('/ur_driver/get_tcp_pose',get_tcp_pose)
+            result = tcp_service('')
+            # rospy.logwarn(str(result.current_pose))
+            return result.current_pose
+        except rospy.ServiceException, e:
+            print e
 
     def stop_robot(self):
         rospy.wait_for_service('/ur_driver/stop')

@@ -462,7 +462,7 @@ class UR5ServoDriver(object):
     IDLE = 1
     SERVO = 2
     FREEDRIVE = 3
-    TEST = 4
+    SERVO_IDLE = 4
     default_vel = .1
     default_acc = .5
 
@@ -475,7 +475,7 @@ class UR5ServoDriver(object):
         self.connection = None
         self.__mode = self.DISCONNECTED
         self.freedrive = False
-        self.servo_enabled = True
+        self.servo_enable = False
         self.last_commanded_pose = None
 
 
@@ -485,10 +485,10 @@ class UR5ServoDriver(object):
 
         rospy.logwarn('UR5 --> Loading Interfaces')
         # Subscribers
-        self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.pose_cb)
+        self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.servo_pose_cb)
         # Services
         self.movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
-        self.servoc_srv = rospy.Service('/ur_driver/servoc', ur_driver.srv.servoc, self.service_servoc)
+        self.servo_to_pose_srv = rospy.Service('/ur_driver/servo_to_pose', ur_driver.srv.servo_to_pose, self.service_servo_to_pose)
         self.free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,self.service_free_drive)
         self.get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
         self.servo_enable_srv = rospy.Service('/ur_driver/servo_enable', ur_driver.srv.servo_enable, self.service_servo_enable)
@@ -544,21 +544,27 @@ class UR5ServoDriver(object):
         if self.__mode == self.DISCONNECTED:
             rospy.logerr('UR5 --> THE ROBOT IS DISCONNECTED')
             pass
+
         # Robot is idle, and therefore connected with program_reset loaded
         elif self.__mode == self.IDLE:
-            if self.servo_enabled == True:
+            rospy.logwarn('UR5 --> Mode switching to SERVO')
+            # Quit the running program
+            self.connected_robot = getConnectedRobot(wait=False)
+            if self.connected_robot: 
+                print "Quitting Current Program"
+                connected_robot.send_quit()
+            self.connect_to_robot(self.program_servo)
+            self.connection.send_program()
+            rospy.logwarn('UR5 --> Sent default program to robot... running.')
+            self.set_mode(self.SERVO_IDLE)
+
+        # Currently in idle servo mode
+        elif self.__mode == self.SERVO_IDLE:
+            # Check for Servo enable
+            if self.servo_enable == True:
                 rospy.logwarn('UR5 --> Mode switching to SERVO')
-                # Quit the running program
-                self.connected_robot = getConnectedRobot(wait=False)
-                if self.connected_robot: 
-                    print "Quitting Current Program"
-                    connected_robot.send_quit()
-                self.connect_to_robot(self.program_servo)
-                self.connection.send_program()
-                rospy.logwarn('UR5 --> Sent default program to robot... running.')
                 self.set_mode(self.SERVO)
-        # Currently in servo mode
-        elif self.__mode == self.SERVO:
+                
             # Check for Freedrive enable
             if self.freedrive == True:
                 rospy.logwarn('UR5 --> Mode switching to FREEDRIVE')
@@ -571,7 +577,15 @@ class UR5ServoDriver(object):
                 self.connection.send_program()
                 self.set_mode(self.FREEDRIVE)
             else:
-                pass                
+                pass  
+
+        # Currently in servo mode
+        elif self.__mode == self.SERVO:
+            # Check for servo disable
+            if self.servo_enable == False:
+                rospy.logwarn('UR5 --> Mode switching to SERVO IDLE')
+                self.set_mode(self.SERVO_IDLE)          
+
         # Currently in freedrive mode
         elif self.__mode == self.FREEDRIVE:
             if self.freedrive == False:
@@ -652,27 +666,29 @@ class UR5ServoDriver(object):
         # self.init_joint_states = self.robot.get_joint_states()   
         # self.init_tcp_state = self.robot.get_tcp_state() 
 
-    def pose_cb(self,msg):
-        target = msg.pose
-        if self.connected_robot: 
-            accel = self.default_acc
-            vel = self.default_vel
-            T = tf_c.fromMsg(target)
-            a,axis = T.M.GetRotAngle()
-            pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
-            current_pose = self.connected_robot.get_tcp_axis_angle()
+    def servo_pose_cb(self,msg):
+        if self.__mode == self.SERVO:
+            target = msg.pose
+            if self.connected_robot: 
+                accel = self.default_acc
+                vel = self.default_vel
+                T = tf_c.fromMsg(target)
+                a,axis = T.M.GetRotAngle()
+                pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
+                current_pose = self.connected_robot.get_tcp_axis_angle()
 
-            if pose != self.last_commanded_pose:
-                try:
-                    # Command pose to robot
-                    print 'Sending Pose'
-                    self.connected_robot.send_movel(0, pose, accel, vel)
-                    self.last_commanded_pose = pose
-                except socket.error:
-                    rospy.logerr('FAILURE sending ' + str(pose))
-            else:
-                pass
-                # print 'Duplicate pose... not sent'
+                if pose != self.last_commanded_pose:
+                    try:
+                        # Command pose to robot
+                        print 'Sending Pose'
+                        self.connected_robot.send_movel(0, pose, accel, vel)
+                        self.last_commanded_pose = pose
+                    except socket.error:
+                        rospy.logerr('FAILURE sending ' + str(pose))
+                else:
+                    pass
+        else:
+            rospy.logerr('SERVO DISABLED')
 
     def debug(self):
         self.connected_robot = getConnectedRobot(wait=False)
@@ -685,6 +701,7 @@ class UR5ServoDriver(object):
                     self.servoing_to_position = False
 
     def service_movel(self,data):
+        # TODO Implement movel call
         pass
 
     def check_distance(self,a,b,val):
@@ -696,23 +713,30 @@ class UR5ServoDriver(object):
         else:
             return False
 
-    def service_servoc(self,data):
+    def service_servo_to_pose(self,data):
         print 'service servoc called'
-        self.connected_robot = getConnectedRobot(wait=False)
-        if self.connected_robot: 
-            target = data.target # target is a Pose
-            accel = data.accel
-            vel = data.vel
-            T = tf_c.fromMsg(target)
-            a,axis = T.M.GetRotAngle()
-            pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
-            try:
-                self.connected_robot.send_servoc(0, pose, accel, vel)
-                return str(pose)
-            except socket.error:
-                return 'FAILURE sending ' + str(pose)
+        if self.__mode == self.SERVO:
+            self.connected_robot = getConnectedRobot(wait=False)
+            if self.connected_robot: 
+                target = data.target # target is a Pose
+                accel = data.accel
+                vel = data.vel
+                T = tf_c.fromMsg(target)
+                a,axis = T.M.GetRotAngle()
+                pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
+                try:
+                    self.connected_robot.send_servoc(0, pose, accel, vel)
+                    reached_pose = False
+                    while not reached_pose:
+                        if self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
+                            reached_pose = True
+                    return str(pose)
+                except socket.error:
+                    return 'FAILURE sending ' + str(pose)
+            else:
+                return 'NO ROBOT CONNECTED'
         else:
-            return 'No Robot Available'
+            return 'SERVO DISABLED'
 
     def service_get_tcp_pose(self,data):
         print 'service get_tcp_pose called'
@@ -725,8 +749,8 @@ class UR5ServoDriver(object):
         else:
             return 'No Robot Available'
 
-    def service_free_drive(self,data):
-        active = data.active
+    def service_free_drive(self,msg):
+        active = msg.active
         if active == False:
             self.freedrive = False
             return 'DISABLED'
@@ -735,13 +759,14 @@ class UR5ServoDriver(object):
             return 'ENABLED'
     
     def service_home(self,msg):
-        pass
+        if self.__mode == self.SERVO:
+            pass
 
     def service_stop(self,msg):
         if self.__mode == self.SERVO:
             self.connected_robot = getConnectedRobot(wait=False)
             if self.connected_robot:
-                # self.connected_robot.send_stopj() 
+                self.connected_robot.send_stopj() 
                 return 'SUCCESS'
             else:
                 return 'No connected robot'
@@ -751,12 +776,11 @@ class UR5ServoDriver(object):
     def service_servo_enable(self,msg):
         enable = msg.req
         if enable == True:
-            if self.__mode == self.SERVO:
-                pass
-            else:
-                self.servo_enabled = True
+            self.servo_enable = True
+            return 'ENABLED'
         else:
-            pass
+            self.servo_enable = False
+            return 'DISABLED'
         
     def load_joint_offsets(self,joint_names):
         robot_description = rospy.get_param("robot_description")
@@ -788,7 +812,7 @@ class UR5ServoDriver(object):
         elif self.__mode == 3:
             m = 'FREEDRIVE' 
         elif self.__mode == 4:
-            m = 'TEST' 
+            m = 'SERVO IDLE' 
         self.status_pub.publish(String(m))
 
 # MAIN ------------------------------------------------------------------------#
