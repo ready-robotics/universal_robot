@@ -36,7 +36,8 @@
       <geometry>
         <mesh filename="package://ur_description/meshes/ur5/visual/Base.dae"/>
       </geometry>
-      <origin rpy="0.0 0.0 2.3561944875" xyz="0.0 0.0 0.003"/>
+      <!-- <origin rpy="0.0 0.0 2.3561944875" xyz="0.0 0.0 0.003"/> -->
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.003"/>
     </visual>
     <collision>
       <geometry>
