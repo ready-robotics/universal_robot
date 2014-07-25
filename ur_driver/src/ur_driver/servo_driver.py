@@ -715,7 +715,7 @@ class UR5ServoDriver(object):
             if self.last_commanded_pose: 
                 if not self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
                     self.servoing_to_position = True
-                    print 'servoing to position'
+                    # print 'servoing to position'
                 else:
                     self.servoing_to_position = False
 

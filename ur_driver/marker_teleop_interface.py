@@ -62,6 +62,8 @@ class URStatus(QWidget):
             self.servo_enable = True
             self.latest_pose = self.get_tcp_pose()
             rospy.logwarn("Continuous Servo Enabled")
+            self.enabled_label.setText('ENABLED')
+            self.enabled_label.setStyleSheet('color:#ffffff;background-color:#ADE817')
 
     def disable(self):
         if self.servo_enable == False:
@@ -70,6 +72,8 @@ class URStatus(QWidget):
             self.servo_enable = False
             self.latest_pose = self.get_tcp_pose()
             rospy.logwarn("Continuous Servo Disabled")
+            self.enabled_label.setText('DISABLED')
+            self.enabled_label.setStyleSheet('color:#ffffff;background-color:#FF9100')
 
     def servo_to_pose(self):
         self.latest_pose = self.get_tcp_pose()
