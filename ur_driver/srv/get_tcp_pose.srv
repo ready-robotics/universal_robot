@@ -1,0 +1,4 @@
+string req
+---
+geometry_msgs/Pose current_pose
+float32[] current_euler

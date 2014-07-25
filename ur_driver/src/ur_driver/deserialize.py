@@ -194,6 +194,7 @@ class AdditionalInfo(object):
         ai = AdditionalInfo()
         (_, _, ai.ctrl_bits, ai.teach_button) = struct.unpack_from("!IBIB", buf)
         return ai
+        
 
 class RobotState(object):
     __slots__ = ['robot_mode_data', 'joint_data', 'tool_data',
