@@ -463,8 +463,8 @@ class UR5ServoDriver(object):
     SERVO = 2
     FREEDRIVE = 3
     SERVO_IDLE = 4
-    default_vel = .1
-    default_acc = .5
+    default_vel = .3
+    default_acc = .7
 
     def __init__(self):
         rospy.logwarn('UR5 --> DRIVER STARTED')
@@ -485,7 +485,7 @@ class UR5ServoDriver(object):
 
         rospy.logwarn('UR5 --> Loading Interfaces')
         # Subscribers
-        self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.servo_pose_cb)
+        self.pose_sub = rospy.Subscriber("/ur5_command_pose",PoseStamped,self.servo_continuous_cb)
         # TF
         self.broadcaster = tf.TransformBroadcaster()
         # Services
@@ -668,7 +668,7 @@ class UR5ServoDriver(object):
         # self.init_joint_states = self.robot.get_joint_states()   
         # self.init_tcp_state = self.robot.get_tcp_state() 
 
-    def servo_pose_cb(self,msg):
+    def servo_continuous_cb(self,msg):
         if self.__mode == self.SERVO:
             target = msg.pose
             if self.connected_robot: 
@@ -677,10 +677,21 @@ class UR5ServoDriver(object):
                 T = tf_c.fromMsg(target)
                 a,axis = T.M.GetRotAngle()
                 pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
+
+
                 current_pose = self.connected_robot.get_tcp_axis_angle()
 
-                if pose != self.last_commanded_pose:
+                if not self.check_distance(self.last_commanded_pose,pose,.001):
+                # if pose != self.last_commanded_pose:
+
+                    print '-------- COMMANDED POSE -----------'
+                    print 'desired:'
+                    print pose
+                    print 'current:'
+                    print self.connected_robot.get_tcp_axis_angle()
+
                     try:
+                        pass
                         # Command pose to robot
                         print 'Sending Pose'
                         self.connected_robot.send_movel(0, pose, accel, vel)
@@ -688,7 +699,7 @@ class UR5ServoDriver(object):
                     except socket.error:
                         rospy.logerr('FAILURE sending ' + str(pose))
                 else:
-                    pass
+                    print 'COMMANDED POSE IS SAME AS LAST... IGNORING'
         else:
             rospy.logerr('SERVO DISABLED')
 
@@ -699,7 +710,7 @@ class UR5ServoDriver(object):
             if pose:
                 F = tf_c.fromMsg(pose)
                 # print connected_robot.get_tcp_axis_angle()
-                self.broadcaster.sendTransform(tuple(F.p),tuple(F.M.GetQuaternion()),rospy.Time.now(), '/endpoint','/ur_base')
+                self.broadcaster.sendTransform(tuple(F.p),tuple(F.M.GetQuaternion()),rospy.Time.now(), '/endpoint','/base_link')
 
             if self.last_commanded_pose: 
                 if not self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
@@ -729,32 +740,32 @@ class UR5ServoDriver(object):
         T = tf_c.fromMsg(target)
         a,axis = T.M.GetRotAngle()
         pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
+        print '-------- COMMANDED POSE -----------'
         print 'desired:'
         print pose
         print 'current:'
         print self.connected_robot.get_tcp_axis_angle()
 
+        print '--- Attempting to servo to pose ---'
         if self.__mode == self.SERVO:
             self.connected_robot = getConnectedRobot(wait=False)
             if self.connected_robot: 
-                target = data.target # target is a Pose
-                accel = data.accel
-                vel = data.vel
-                T = tf_c.fromMsg(target)
-                a,axis = T.M.GetRotAngle()
-                pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
                 try:
-                    self.connected_robot.send_servoc(0, pose, accel, vel)
+                    self.connected_robot.send_movel(0, pose, accel, vel)
+                    self.last_commanded_pose = pose
                     reached_pose = False
                     while not reached_pose:
                         if self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
                             reached_pose = True
+                        rospy.sleep(.01)
+                        print 'moving to pose'    
                     return str(pose)
                 except socket.error:
                     return 'FAILURE sending ' + str(pose)
             else:
                 return 'NO ROBOT CONNECTED'
         else:
+            rospy.logerr('SERVO DISABLED')
             return 'SERVO DISABLED'
 
     def service_get_tcp_pose(self,data):

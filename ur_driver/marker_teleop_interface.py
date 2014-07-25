@@ -76,12 +76,14 @@ class URStatus(QWidget):
         rospy.wait_for_service('/ur_driver/servo_to_pose')
         try:
             pose_servo_proxy = rospy.ServiceProxy('/ur_driver/servo_to_pose',servo_to_pose)
-            F_target = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
-            F_ur_base_to_base_link = tf_c.fromTf(self.listener_.lookupTransform('/ur_base','/base_link',rospy.Time(0)))
-            F_target_trans = F_target * F_ur_base_to_base_link.Inverse()
+            
+            F_target_world = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
+            F_target_base = tf_c.fromTf(self.listener_.lookupTransform('/base_link','/target_frame',rospy.Time(0)))
+            F_base_world = tf_c.fromTf(self.listener_.lookupTransform('/world','/base_link',rospy.Time(0)))
+            F_command = F_base_world.Inverse()*F_target_world
                 
             msg = ur_driver.srv.servo_to_poseRequest()
-            msg.target = tf_c.toMsg(F_target_trans)
+            msg.target = tf_c.toMsg(F_command)
             msg.accel = .3
             msg.vel = .1
             # Send Servo Command
@@ -94,27 +96,13 @@ class URStatus(QWidget):
     def update(self):
         if self.servo_enable == True:
             try:
-                F_target = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
-                F_ee = tf_c.fromTf(self.listener_.lookupTransform('/world','/endpoint',rospy.Time(0)))
-                F_reported_ee = tf_c.fromMsg(self.latest_pose)
-                F_ur_base_to_base_link = tf_c.fromTf(self.listener_.lookupTransform('/ur_base','/base_link',rospy.Time(0)))
-                self.broadcaster_.sendTransform(tuple(F_ur_base_to_base_link.p),tuple(F_ur_base_to_base_link.M.GetQuaternion()),rospy.Time.now(), '/other_base','/world')
+                F_target_world = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
+                F_target_base = tf_c.fromTf(self.listener_.lookupTransform('/base_link','/target_frame',rospy.Time(0)))
+                F_base_world = tf_c.fromTf(self.listener_.lookupTransform('/world','/base_link',rospy.Time(0)))
+                F_command = F_base_world.Inverse()*F_target_world
 
-                F_calc = F_ee*F_ur_base_to_base_link.Inverse()
-
-                self.broadcaster_.sendTransform(tuple(F_reported_ee.p),tuple(F_reported_ee.M.GetQuaternion()),rospy.Time.now(), '/endpoint_reported','/world')
-                self.broadcaster_.sendTransform(tuple(F_calc.p),tuple(F_calc.M.GetQuaternion()),rospy.Time.now(), '/endpoint_calc','/world')
-                
-                self.broadcaster_.sendTransform(tuple(F_target.p),tuple(F_target.M.GetQuaternion()),rospy.Time.now(), '/target','/world')
-
-                F_target_in_base = F_target*F_ur_base_to_base_link
-                self.broadcaster_.sendTransform(tuple(F_target_in_base.p),tuple(F_target_in_base.M.GetQuaternion()),rospy.Time.now(), '/target_in_base','/world')
-
-                self.target_pose = tf_c.toMsg(F_target)
                 cmd = PoseStamped()
-                cmd.pose.position = self.target_pose.position
-                cmd.pose.orientation = self.initial_pose.orientation
-
+                cmd.pose = tf_c.toMsg(F_command)
                 self.target_pub.publish(cmd)
 
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
