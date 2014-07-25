@@ -31,13 +31,13 @@ catkin_python_setup()
 # Generate services in the 'srv' folder
 add_service_files(
   FILES
-  free_drive.srv
-  get_tcp_pose.srv
-  movel.srv
-  servo_to_pose.srv
-  servo_enable.srv
-  home.srv
-  stop.srv
+  FreeDrive.srv
+  GetTcpPose.srv
+  ServoToPose.srv
+  ServoEnable.srv
+  MoveToPose.srv
+  Home.srv
+  Stop.srv
 )
 
 # Generate added messages and services with any dependencies listed here

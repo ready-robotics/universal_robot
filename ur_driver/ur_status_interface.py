@@ -62,13 +62,13 @@ class URStatus(QWidget):
         if self.freedrive == False:
             if self.servo == False:
                 try:
-                    rospy.wait_for_service('/ur_driver/servo_enable',2)
+                    rospy.wait_for_service('/ur_driver/ServoEnable',2)
                 except rospy.ROSException as e:
-                    print 'Could not find servo_enable service'
+                    print 'Could not find ServoEnable service'
                     self.msg_label.setText("NO SERVO_ENABLE SERVICE")
                     return
                 try:
-                    servo_enable_service = rospy.ServiceProxy('/ur_driver/servo_enable',servo_enable)
+                    servo_enable_service = rospy.ServiceProxy('/ur_driver/ServoEnable',ServoEnable)
                     result = servo_enable_service(True)
                     self.servo = True
                     self.servo_enable_label.setText('ENABLED')
@@ -86,13 +86,13 @@ class URStatus(QWidget):
         if self.freedrive == False:
             if self.servo == True:
                     try:
-                        rospy.wait_for_service('/ur_driver/servo_enable',2)
+                        rospy.wait_for_service('/ur_driver/ServoEnable',2)
                     except rospy.ROSException as e:
-                        print 'Could not find servo_enable service'
+                        print 'Could not find ServoEnable service'
                         self.msg_label.setText("NO SERVO_ENABLE SERVICE")
                         return
                     try:
-                        servo_enable_service = rospy.ServiceProxy('/ur_driver/servo_enable',servo_enable)
+                        servo_enable_service = rospy.ServiceProxy('/ur_driver/ServoEnable',ServoEnable)
                         result = servo_enable_service(False)
                         self.servo = False
                         self.servo_enable_label.setText('DISABLED')
@@ -112,12 +112,12 @@ class URStatus(QWidget):
         if self.servo == False:
             if self.freedrive == False:
                 try:
-                    rospy.wait_for_service('/ur_driver/free_drive',2)
+                    rospy.wait_for_service('/ur_driver/FreeDrive',2)
                 except rospy.ROSException as e:
                     print 'Could not find freedrive service'
                     return
                 try:
-                    free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
+                    free_drive_service = rospy.ServiceProxy('/ur_driver/FreeDrive',FreeDrive)
                     result = free_drive_service(True)
                     # print 'Service returned: ' + str(result.ack)
                     self.freedrive = True
@@ -134,12 +134,12 @@ class URStatus(QWidget):
     def freedrive_disable(self):
         if self.freedrive == True:
             try:
-                rospy.wait_for_service('/ur_driver/free_drive',2)
+                rospy.wait_for_service('/ur_driver/FreeDrive',2)
             except rospy.ROSException as e:
                 print 'Could not find freedrive service'
                 return
             try:
-                free_drive_service = rospy.ServiceProxy('/ur_driver/free_drive',free_drive)
+                free_drive_service = rospy.ServiceProxy('/ur_driver/FreeDrive',FreeDrive)
                 result = free_drive_service(False)
                 # print 'Service returned: ' + str(result.ack)
                 self.freedrive = False

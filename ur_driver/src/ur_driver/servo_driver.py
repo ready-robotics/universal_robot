@@ -489,13 +489,13 @@ class UR5ServoDriver(object):
         # TF
         self.broadcaster = tf.TransformBroadcaster()
         # Services
-        self.movel_srv = rospy.Service('/ur_driver/movel', ur_driver.srv.movel, self.service_movel)
-        self.servo_to_pose_srv = rospy.Service('/ur_driver/servo_to_pose', ur_driver.srv.servo_to_pose, self.service_servo_to_pose)
-        self.free_drive_srv = rospy.Service('/ur_driver/free_drive', ur_driver.srv.free_drive,self.service_free_drive)
-        self.get_tcp_pose_srv = rospy.Service('/ur_driver/get_tcp_pose', ur_driver.srv.get_tcp_pose, self.service_get_tcp_pose)
-        self.servo_enable_srv = rospy.Service('/ur_driver/servo_enable', ur_driver.srv.servo_enable, self.service_servo_enable)
-        self.home_srv = rospy.Service('/ur_driver/home', ur_driver.srv.home, self.service_home)
-        self.stop_srv = rospy.Service('/ur_driver/stop', ur_driver.srv.stop, self.service_stop)
+        self.movel_srv = rospy.Service('/ur_driver/MoveToPose', ur_driver.srv.MoveToPose, self.service_move_to_pose)
+        self.servo_to_pose_srv = rospy.Service('/ur_driver/ServoToPose', ur_driver.srv.ServoToPose, self.service_servo_to_pose)
+        self.free_drive_srv = rospy.Service('/ur_driver/FreeDrive', ur_driver.srv.FreeDrive,self.service_free_drive)
+        self.get_tcp_pose_srv = rospy.Service('/ur_driver/GetTcpPose', ur_driver.srv.GetTcpPose, self.service_get_tcp_pose)
+        self.servo_enable_srv = rospy.Service('/ur_driver/ServoEnable', ur_driver.srv.ServoEnable, self.service_servo_enable)
+        self.home_srv = rospy.Service('/ur_driver/Home', ur_driver.srv.Home, self.service_home)
+        self.stop_srv = rospy.Service('/ur_driver/Stop', ur_driver.srv.Stop, self.service_stop)
 
         rospy.logwarn('UR5 --> Initializing')
 
@@ -719,7 +719,7 @@ class UR5ServoDriver(object):
                 else:
                     self.servoing_to_position = False
 
-    def service_movel(self,data):
+    def service_move_to_pose(self,data):
         # TODO Implement movel call
         pass
 

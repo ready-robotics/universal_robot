@@ -73,16 +73,16 @@ class URStatus(QWidget):
 
     def servo_to_pose(self):
         self.latest_pose = self.get_tcp_pose()
-        rospy.wait_for_service('/ur_driver/servo_to_pose')
+        rospy.wait_for_service('/ur_driver/ServoToPose')
         try:
-            pose_servo_proxy = rospy.ServiceProxy('/ur_driver/servo_to_pose',servo_to_pose)
+            pose_servo_proxy = rospy.ServiceProxy('/ur_driver/ServoToPose',ServoToPose)
             
             F_target_world = tf_c.fromTf(self.listener_.lookupTransform('/world','/target_frame',rospy.Time(0)))
             F_target_base = tf_c.fromTf(self.listener_.lookupTransform('/base_link','/target_frame',rospy.Time(0)))
             F_base_world = tf_c.fromTf(self.listener_.lookupTransform('/world','/base_link',rospy.Time(0)))
             F_command = F_base_world.Inverse()*F_target_world
                 
-            msg = ur_driver.srv.servo_to_poseRequest()
+            msg = ur_driver.srv.ServoToPoseRequest()
             msg.target = tf_c.toMsg(F_command)
             msg.accel = .3
             msg.vel = .1
@@ -112,9 +112,9 @@ class URStatus(QWidget):
             # rospy.logwarn('Not in servo mode')
 
     def get_tcp_pose(self):
-        rospy.wait_for_service('/ur_driver/get_tcp_pose')
+        rospy.wait_for_service('/ur_driver/GetTcpPose')
         try:
-            tcp_service = rospy.ServiceProxy('/ur_driver/get_tcp_pose',get_tcp_pose)
+            tcp_service = rospy.ServiceProxy('/ur_driver/GetTcpPose',GetTcpPose)
             result = tcp_service('')
             return result.current_pose
         except rospy.ServiceException, e:
