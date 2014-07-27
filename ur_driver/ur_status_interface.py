@@ -54,6 +54,15 @@ class URStatus(QWidget):
         self.servo_enable_btn.clicked.connect(self.servo_enable)
         self.servo_disable_btn.clicked.connect(self.servo_disable)
 
+        self.gripper_open_btn.clicked.connect(self.gripper_open)
+        self.gripper_close_btn.clicked.connect(self.gripper_close)
+
+    def gripper_open(self):
+        pass
+
+    def gripper_close(self):
+        pass
+
     def status_cb(self,msg):
         self.status = msg.data
 

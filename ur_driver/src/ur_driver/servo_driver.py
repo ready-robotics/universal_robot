@@ -744,8 +744,11 @@ class UR5ServoDriver(object):
         print 'desired:'
         print pose
         print 'current:'
-        print self.connected_robot.get_tcp_axis_angle()
-
+        self.connected_robot = getConnectedRobot(wait=False)
+        if self.connected_robot:
+            print self.connected_robot.get_tcp_axis_angle()
+        else:
+            print 'no connected robot'
         print '--- Attempting to servo to pose ---'
         if self.__mode == self.SERVO:
             self.connected_robot = getConnectedRobot(wait=False)
