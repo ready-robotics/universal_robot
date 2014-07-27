@@ -88,11 +88,13 @@ class URStatus(QWidget):
                 
             msg = ur_driver.srv.ServoToPoseRequest()
             msg.target = tf_c.toMsg(F_command)
-            msg.accel = .3
-            msg.vel = .1
+            msg.accel = .7
+            msg.vel = .3
             # Send Servo Command
+            rospy.logwarn('Single Servo Move Started')
             result = pose_servo_proxy(msg)
-            print str(result.ack)
+            rospy.logwarn('Single Servo Move Finished')
+            rospy.logwarn(str(result.ack))
 
         except rospy.ServiceException, e:
             print e

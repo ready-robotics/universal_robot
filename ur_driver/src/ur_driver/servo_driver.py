@@ -758,15 +758,15 @@ class UR5ServoDriver(object):
                         if self.check_distance(self.last_commanded_pose,self.connected_robot.get_tcp_axis_angle(),.001):
                             reached_pose = True
                         rospy.sleep(.01)
-                        print 'moving to pose'    
+                        # print 'moving to pose'    
                     return str(pose)
                 except socket.error:
                     return 'FAILURE sending ' + str(pose)
             else:
-                return 'NO ROBOT CONNECTED'
+                return 'FAILURE: NO ROBOT CONNECTED'
         else:
             rospy.logerr('SERVO DISABLED')
-            return 'SERVO DISABLED'
+            return 'FAILURE: SERVO DISABLED'
 
     def service_get_tcp_pose(self,data):
         # print 'service get_tcp_pose called'
@@ -777,7 +777,7 @@ class UR5ServoDriver(object):
             resp.current_euler = self.connected_robot.get_tcp_axis_angle()
             return resp
         else:
-            return 'No Robot Available'
+            return 'FAILURE: No Robot Available'
 
     def service_free_drive(self,msg):
         active = msg.active
@@ -799,9 +799,9 @@ class UR5ServoDriver(object):
                 self.connected_robot.send_stopj() 
                 return 'SUCCESS'
             else:
-                return 'No connected robot'
+                return 'FAILURE: No connected robot'
         else:
-            return 'Not in servo mode'
+            return 'FAILURE: Not in servo mode'
 
     def service_servo_enable(self,msg):
         enable = msg.req
