@@ -16,6 +16,7 @@ from ur_driver.srv import *
 import tf; from tf import *
 import tf_conversions as tf_c
 import rospkg
+from robotiq_c_model_control.srv import *
 
 class URStatus(QWidget):
     def __init__(self,app):
@@ -58,10 +59,36 @@ class URStatus(QWidget):
         self.gripper_close_btn.clicked.connect(self.gripper_close)
 
     def gripper_open(self):
-        pass
+        try:
+            rospy.wait_for_service('/robotiq_c_model_control/Open',2)
+        except rospy.ROSException as e:
+            print 'Could not find gripper Open service'
+            self.msg_label.setText("NO GRIPPER OPEN SERVICE")
+            return
+        try:
+            gripper_open_proxy = rospy.ServiceProxy('/robotiq_c_model_control/Open',Open)
+            result = gripper_open_proxy(True)
+            self.gripper_state_label.setText('OPEN')
+            self.gripper_state_label.setStyleSheet('color:#ffffff;background-color:#3FC4FC')
+            self.msg_label.setText("GRIPPER OPENED")
+        except rospy.ServiceException, e:
+            print e
 
     def gripper_close(self):
-        pass
+        try:
+            rospy.wait_for_service('/robotiq_c_model_control/Open',2)
+        except rospy.ROSException as e:
+            print 'Could not find gripper Open service'
+            self.msg_label.setText("NO GRIPPER OPEN SERVICE")
+            return
+        try:
+            gripper_open_proxy = rospy.ServiceProxy('/robotiq_c_model_control/Open',Open)
+            result = gripper_open_proxy(False)
+            self.gripper_state_label.setText('CLOSED')
+            self.gripper_state_label.setStyleSheet('color:#ffffff;background-color:#6AAAC4')
+            self.msg_label.setText("GRIPPER CLOSED")
+        except rospy.ServiceException, e:
+            print e
 
     def status_cb(self,msg):
         self.status = msg.data
