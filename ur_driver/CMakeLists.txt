@@ -6,7 +6,10 @@ project(ur_driver)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  geometry_msgs)
+  geometry_msgs
+  rospy
+  rqt_gui
+  rqt_gui_py)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)

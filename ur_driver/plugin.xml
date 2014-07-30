@@ -5,7 +5,7 @@
     </description>
     <qtgui>
       <group>
-        <label>UniversalRobot</label>
+        <label>Instructor</label>
       </group>
       <label>UR5 Status Pannel</label>
       <icon type="theme">system-help</icon>
@@ -19,7 +19,7 @@
     </description>
     <qtgui>
       <group>
-        <label>UniversalRobot</label>
+        <label>Instructor</label>
       </group>
       <label>UR5 Marker Teleop</label>
       <icon type="theme">system-help</icon>

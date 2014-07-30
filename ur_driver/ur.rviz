@@ -186,21 +186,35 @@ Visualization Manager:
       Frames:
         All Enabled: false
         base_link:
+          Value: true
+        camera_1/ar_marker_0:
+          Value: true
+        camera_1_depth_frame:
           Value: false
-        camera_depth_frame:
+        camera_1_depth_optical_frame:
           Value: false
-        camera_depth_optical_frame:
+        camera_1_link:
+          Value: true
+        camera_1_rgb_frame:
           Value: false
-        camera_link:
+        camera_1_rgb_optical_frame:
           Value: false
-        camera_rgb_frame:
+        camera_2/ar_marker_0:
           Value: false
-        camera_rgb_optical_frame:
+        camera_2_depth_frame:
+          Value: false
+        camera_2_depth_optical_frame:
+          Value: false
+        camera_2_link:
+          Value: true
+        camera_2_rgb_frame:
+          Value: false
+        camera_2_rgb_optical_frame:
           Value: false
         ee_link:
           Value: false
         endpoint:
-          Value: false
+          Value: true
         forearm_link:
           Value: false
         robotiq_85_adapter_link:
@@ -227,20 +241,10 @@ Visualization Manager:
           Value: false
         target_frame:
           Value: false
-        test:
-          Value: true
-        test1:
-          Value: true
-        test2:
-          Value: true
-        test3:
-          Value: true
-        test_waypoint:
-          Value: true
         upper_arm_link:
           Value: false
         world:
-          Value: false
+          Value: true
         wrist_1_link:
           Value: false
         wrist_2_link:
@@ -255,6 +259,14 @@ Visualization Manager:
       Tree:
         world:
           base_link:
+            camera_2_link:
+              camera_2_depth_frame:
+                camera_2_depth_optical_frame:
+                  {}
+              camera_2_rgb_frame:
+                camera_2_rgb_optical_frame:
+                  camera_2/ar_marker_0:
+                    {}
             endpoint:
               {}
             shoulder_link:
@@ -264,6 +276,14 @@ Visualization Manager:
                     wrist_2_link:
                       wrist_3_link:
                         ee_link:
+                          camera_1_link:
+                            camera_1_depth_frame:
+                              camera_1_depth_optical_frame:
+                                {}
+                            camera_1_rgb_frame:
+                              camera_1_rgb_optical_frame:
+                                camera_1/ar_marker_0:
+                                  {}
                           robotiq_85_adapter_link:
                             robotiq_85_base_link:
                               robotiq_85_left_inner_knuckle_link:
@@ -279,16 +299,6 @@ Visualization Manager:
                                 robotiq_85_right_finger_link:
                                   {}
           target_frame:
-            {}
-          test:
-            {}
-          test1:
-            {}
-          test2:
-            {}
-          test3:
-            {}
-          test_waypoint:
             {}
       Update Interval: 0
       Value: true
@@ -331,7 +341,7 @@ Visualization Manager:
       Pitch: 0.709797
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.44048
+      Yaw: 2.91547
     Saved: ~
 Window Geometry:
   Displays:
@@ -349,5 +359,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1270
-  X: 609
-  Y: 73
+  X: 553
+  Y: 41
