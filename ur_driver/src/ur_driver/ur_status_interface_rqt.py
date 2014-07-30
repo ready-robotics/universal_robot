@@ -58,11 +58,14 @@ class URStatusPanel(Plugin):
             rospy.wait_for_service('/robotiq_c_model_control/Open',2)
         except rospy.ROSException as e:
             print 'Could not find gripper Open service'
-            self.msg_label.setText("NO GRIPPER OPEN SERVICE")
+            self._widget.msg_label.setText("NO GRIPPER OPEN SERVICE")
             return
         try:
             gripper_open_proxy = rospy.ServiceProxy('/robotiq_c_model_control/Open',Open)
-            result = gripper_open_proxy(True)
+            msg = OpenRequest()
+            msg.state = True
+            msg.wait = True
+            result = gripper_open_proxy(msg)
             self._widget.gripper_state_label.setText('OPEN')
             self._widget.gripper_state_label.setStyleSheet('color:#ffffff;background-color:#3FC4FC')
             self._widget.msg_label.setText("GRIPPER OPENED")
@@ -78,7 +81,10 @@ class URStatusPanel(Plugin):
             return
         try:
             gripper_open_proxy = rospy.ServiceProxy('/robotiq_c_model_control/Open',Open)
-            result = gripper_open_proxy(False)
+            msg = OpenRequest()
+            msg.state = False
+            msg.wait = True
+            result = gripper_open_proxy(msg)
             self._widget.gripper_state_label.setText('CLOSED')
             self._widget.gripper_state_label.setStyleSheet('color:#ffffff;background-color:#6AAAC4')
             self._widget.msg_label.setText("GRIPPER CLOSED")
