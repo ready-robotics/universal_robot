@@ -465,6 +465,8 @@ class UR5ServoDriver(object):
     SERVO_IDLE = 4
     default_vel = .3
     default_acc = .7
+    max_vel=1.5
+    max_acc =1.5
 
     def __init__(self):
         rospy.logwarn('UR5 --> DRIVER STARTED')
@@ -735,7 +737,11 @@ class UR5ServoDriver(object):
     def service_servo_to_pose(self,data):
         # print 'service servoc called'
         target = data.target # target is a Pose
-        accel = data.accel
+        if data.accel > max_velocity:
+            accel = max_acc
+        else:
+            accel = data.accel
+        
         vel = data.vel
         T = tf_c.fromMsg(target)
         a,axis = T.M.GetRotAngle()
