@@ -52,10 +52,13 @@
   <run_depend>python-beautifulsoup</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>message_runtime</run_depend>
+  <run_depend>rqt_gui</run_depend>
+  <run_depend>rqt_gui_py</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
     <!-- You can specify that this package is a metapackage here: -->
     <!-- <metapackage/> -->
 

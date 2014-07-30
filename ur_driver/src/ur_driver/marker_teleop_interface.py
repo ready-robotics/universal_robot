@@ -18,9 +18,9 @@ import tf; from tf import *
 import tf_conversions as tf_c
 import rospkg
 
-class URStatus(QWidget):
+class URMarkerTeleop(QWidget):
     def __init__(self,app):
-        super(URStatus,self).__init__()
+        super(URMarkerTeleop,self).__init__()
         self.app_ = app
         self.servo_enable = False
         self.listener_ = TransformListener()
@@ -144,7 +144,7 @@ class URStatus(QWidget):
 if __name__ == '__main__':
     rospy.init_node('ur_status_interface',anonymous=True)
     app = QApplication(sys.argv)
-    status_app = URStatus(app)
+    status_app = URMarkerTeleop(app)
     # Running
     app.exec_()
     # Done
