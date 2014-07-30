@@ -63,7 +63,10 @@ class URStatus(QWidget):
             return
         try:
             gripper_open_proxy = rospy.ServiceProxy('/robotiq_c_model_control/Open',Open)
-            result = gripper_open_proxy(True)
+            msg = OpenRequest()
+            msg.state = True
+            msg.wait = True
+            result = gripper_open_proxy(msg)
             self.gripper_state_label.setText('OPEN')
             self.gripper_state_label.setStyleSheet('color:#ffffff;background-color:#3FC4FC')
             self.msg_label.setText("GRIPPER OPENED")
@@ -79,7 +82,10 @@ class URStatus(QWidget):
             return
         try:
             gripper_open_proxy = rospy.ServiceProxy('/robotiq_c_model_control/Open',Open)
-            result = gripper_open_proxy(False)
+            msg = OpenRequest()
+            msg.state = False
+            msg.wait = True
+            result = gripper_open_proxy(msg)
             self.gripper_state_label.setText('CLOSED')
             self.gripper_state_label.setStyleSheet('color:#ffffff;background-color:#6AAAC4')
             self.msg_label.setText("GRIPPER CLOSED")
