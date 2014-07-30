@@ -1,5 +1,5 @@
 <library path="src">
-  <class name="URStatus" type="ur_driver.ur_status_interface_rqt.URStatusPanel" base_class_type="rqt_gui_py::Plugin">
+  <class name="URStatusPanel" type="ur_driver.ur_status_interface_rqt.URStatusPanel" base_class_type="rqt_gui_py::Plugin">
     <description>
       A GUI for status and control of the UR5 robot
     </description>
@@ -13,7 +13,7 @@
     </qtgui>
   </class>
 
-<!--   <class name="URStatus" type="ur_driver.marker_teleop_interface_rqt.URMarkerTeleopPanel" base_class_type="rqt_gui_py::Plugin">
+  <class name="URMarkerTeleopPanel" type="ur_driver.marker_teleop_interface_rqt.URMarkerTeleopPanel" base_class_type="rqt_gui_py::Plugin">
     <description>
       A GUI for commanding the UR5 to a published marker position.
     </description>
@@ -25,6 +25,6 @@
       <icon type="theme">system-help</icon>
       <statustip>A GUI for commanding the UR5 to a published marker position.</statustip>
     </qtgui>
-  </class> -->
+  </class>
 </library>
 
