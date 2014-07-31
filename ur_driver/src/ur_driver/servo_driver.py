@@ -781,7 +781,7 @@ class UR5ServoDriver(object):
         # print 'service get_tcp_pose called'
         self.connected_robot = getConnectedRobot(wait=False)
         if self.connected_robot: 
-            resp = ur_driver.srv.get_tcp_poseResponse()
+            resp = ur_driver.srv.GetTcpPoseResponse()
             resp.current_pose = self.connected_robot.get_tcp_state()
             resp.current_euler = self.connected_robot.get_tcp_axis_angle()
             return resp

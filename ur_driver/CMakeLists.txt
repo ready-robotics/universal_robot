@@ -6,7 +6,10 @@ project(ur_driver)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  geometry_msgs)
+  geometry_msgs
+  rospy
+  rqt_gui
+  rqt_gui_py)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -66,7 +69,9 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(
+	${catkin_INCLUDE_DIRS}
+)
 
 ## Declare a cpp library
 # add_library(ur_driver
