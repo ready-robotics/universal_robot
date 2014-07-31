@@ -2,10 +2,10 @@
 
 <launch>
 
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ur_driver)/ur.rviz" />
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ur_driver)/ur.rviz" /> -->
 
-  <node name="ur_status_interface" pkg="ur_driver" type="ur_status_interface.py"/>
-  <node name="marker_teleop_interface" pkg="ur_driver" type="marker_teleop_interface.py"/>
+  <!-- <node name="ur_status_interface" pkg="ur_driver" type="ur_status_interface.py"/> -->
+  <!-- <node name="marker_teleop_interface" pkg="ur_driver" type="marker_teleop_interface.py"/> -->
 
   <node name="target_frame_broadcaster" pkg="lcsr_tf_tools" type="interactive_transform_publisher" args="-.109 -.72 1.47 3.1415 0 -1.5707 /world /target_frame 10"/>
 
