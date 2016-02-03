@@ -17,81 +17,49 @@ def driverProg():
   MULT_time = 1000000.0
   MULT_blend = 1000.0
   pi = 3.14159265359
-  
-  def send_out(msg):
-    enter_critical
-    socket_send_int(MSG_OUT)
-    socket_send_string(msg)
-    socket_send_string("~")
-    exit_critical
-  end
-  
-  def send_waypoint_finished(waypoint_id):
-    enter_critical
-    socket_send_int(MSG_WAYPOINT_FINISHED)
-    socket_send_int(waypoint_id)
-    exit_critical
-  end
-  
-  thread statePublisherThread():
-    def send_joint_state():
-      q = get_joint_positions()
-      qdot = get_joint_speeds()
-      tau = get_joint_torques()
-      enter_critical
-      socket_send_int(MSG_JOINT_STATES)
-      socket_send_int(floor(MULT_jointstate * q[0]))
-      socket_send_int(floor(MULT_jointstate * q[1]))
-      socket_send_int(floor(MULT_jointstate * q[2]))
-      socket_send_int(floor(MULT_jointstate * q[3]))
-      socket_send_int(floor(MULT_jointstate * q[4]))
-      socket_send_int(floor(MULT_jointstate * q[5]))
-      socket_send_int(floor(MULT_jointstate * qdot[0]))
-      socket_send_int(floor(MULT_jointstate * qdot[1]))
-      socket_send_int(floor(MULT_jointstate * qdot[2]))
-      socket_send_int(floor(MULT_jointstate * qdot[3]))
-      socket_send_int(floor(MULT_jointstate * qdot[4]))
-      socket_send_int(floor(MULT_jointstate * qdot[5]))
-      socket_send_int(floor(MULT_jointstate * tau[0]))
-      socket_send_int(floor(MULT_jointstate * tau[1]))
-      socket_send_int(floor(MULT_jointstate * tau[2]))
-      socket_send_int(floor(MULT_jointstate * tau[3]))
-      socket_send_int(floor(MULT_jointstate * tau[4]))
-      socket_send_int(floor(MULT_jointstate * tau[5]))
-      #socket_send_int(7895160)  # Recognizable  ".xxx" or 00787878
-      exit_critical
+
+
+  ### PID Variables
+  Kp = [10.0,10.0,10.0,20.0,20.0,20.0]
+  Ki = [0.0,0.0,0.0,0.0,0.0,0.0]
+  Kd = [0.0,0.0,0.0,0.0,0.0,0.0]
+  P_value = [0,0,0,0,0,0]
+  I_value = [0,0,0,0,0,0]
+  D_value = [0,0,0,0,0,0]
+
+  Derivator = [0.0,0.0,0.0,0.0,0.0,0.0]
+  Integrator = [0.0,0.0,0.0,0.0,0.0,0.0]
+  Integrator_max = 500
+  Integrator_min = -500
+  set_point = [0.0,0.0,0.0,0.0,0.0,0.0]
+  error = [0.0,0.0,0.0,0.0,0.0,0.0]
+
+  def update_pid(v):
+    error[v] = set_point[v] * error[v] 
+    P_value[v] = Kp[v] * error[v]
+    D_value[v] = Kd[v] * ( error[v] - Derivator[v])
+    Derivator[v] = error[v]
+
+    Integrator[v] = Integrator[v] + error[v]
+
+    if Integrator[v] > Integrator_max:
+      Integrator[v] = Integrator_max
     end
-    #socket_open(HOSTNAME, 50002)
-    send_joint_state()
-    while True:
-      send_joint_state()
-      sync()
+    if Integrator[v] < Integrator_min:
+      Integrator[v] = Integrator_min
     end
-    sync()
+    
+    I_value[v] = Integrator[v] * Ki[v]
+
+    PID_update = P_value[v] + I_value[v] + D_value[v]
+
+    return PID_update
   end
 
-  thread tcpStatePublisherThread():
-    def send_tcp_state():
-      p = get_actual_tcp_pose()
-      enter_critical
-      socket_send_int(MSG_TCP_STATE)
-      socket_send_int(floor(MULT_jointstate * p[0]))
-      socket_send_int(floor(MULT_jointstate * p[1]))
-      socket_send_int(floor(MULT_jointstate * p[2]))
-      socket_send_int(floor(MULT_jointstate * p[3]))
-      socket_send_int(floor(MULT_jointstate * p[4]))
-      socket_send_int(floor(MULT_jointstate * p[5]))
-      #socket_send_int(7895160)  # Recognizable  ".xxx" or 00787878
-      exit_critical
-    end
-    #socket_open(HOSTNAME, 50002)
-    send_tcp_state()
-    while True:
-      send_tcp_state()
-      sync()
-    end
-    sync()
-  end
+  def set_pid_setpoint(setpoint):
+    set_point = setpoint
+    Integrator = [0.0,0.0,0.0,0.0,0.0,0.0]
+    Derivator = [0.0,0.0,0.0,0.0,0.0,0.0]
 
   SERVO_IDLE = 0
   SERVO_RUNNING = 1

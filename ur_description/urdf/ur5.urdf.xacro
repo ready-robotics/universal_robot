@@ -247,8 +247,8 @@ center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 
   </joint>
 
   <link name="${prefix}ee_link" />
-
-  <xacro:ur5_arm_transmission prefix="${prefix}" />
+  <!-- KGUERIN CHANGED TO FIX ERROR IN URDF_PARSER_PY  -->
+  <!-- <xacro:ur5_arm_transmission prefix="${prefix}" /> -->
   <xacro:ur5_arm_gazebo prefix="${prefix}" />
 
   </xacro:macro>
