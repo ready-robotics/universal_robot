@@ -56,7 +56,7 @@ center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 
       <geometry>
 		    <mesh filename="package://ur_description/meshes/ur5/visual/Base.dae" />
       </geometry>
-      <origin xyz="0.0 0.0 0.003" rpy="0.0 0.0 ${3.0 * pi / 4.0}" />
+      <origin xyz="0.0 0.0 0.003" rpy="0.0 0.0 ${-1.0 * pi / 4.0}" />
     </visual>
 	<collision>
       <geometry>
@@ -73,7 +73,7 @@ center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 
   <joint name="${prefix}shoulder_pan_joint" type="revolute">
     <parent link="${prefix}base_link" />
     <child link = "${prefix}shoulder_link" />
-    <origin xyz="0.0 0.0 ${shoulder_height}" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 ${shoulder_height}" rpy="0.0 0.0 3.1415" />
     <axis xyz="0 0 1" />
     <limit lower="${-pi}" upper="${pi}" effort="150.0" velocity="${pi}"/>
     <dynamics damping="0.4" friction="0.0"/>
