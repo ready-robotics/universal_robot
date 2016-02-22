@@ -45,7 +45,7 @@
       <string notr="true">background-color:#fefefe</string>
      </property>
      <property name="text">
-      <string>UR5 Control Pannel</string>
+      <string>UR5 Control Panel</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

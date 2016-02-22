@@ -737,12 +737,14 @@ class UR5ServoDriver(object):
     def service_servo_to_pose(self,data):
         # print 'service servoc called'
         target = data.target # target is a Pose
-        if data.accel > max_velocity:
-            accel = max_acc
-        else:
-            accel = data.accel
+        # if data.accel > max_velocity:
+        #     accel = max_acc
+        # else:
+        #     accel = data.accel
+
         
-        vel = data.vel
+        vel = .75
+        accel = 1.5
         T = tf_c.fromMsg(target)
         a,axis = T.M.GetRotAngle()
         pose = list(T.p) + [a*axis[0],a*axis[1],a*axis[2]]
