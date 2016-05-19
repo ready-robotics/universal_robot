@@ -215,10 +215,10 @@
 
   <joint name="ee_fixed_joint" type="fixed">
     <parent link="wrist_3_link"/>
-    <child link="ee_fixed_link"/>
+    <child link="ee_link"/>
     <origin rpy="0.0 0.0 1.570796325" xyz="0.0 0.0823 0.0"/>
   </joint>
-  <link name="ee_fixed_link"/>
+  <link name="ee_link"/>
 
 
   <transmission name="shoulder_pan_trans">

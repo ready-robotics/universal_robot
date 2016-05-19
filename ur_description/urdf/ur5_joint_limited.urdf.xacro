@@ -242,11 +242,11 @@ center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 
 
   <joint name="${prefix}ee_fixed_joint" type="fixed">
     <parent link="${prefix}wrist_3_link" />
-    <child link = "${prefix}ee_fixed_link" />
+    <child link = "${prefix}ee_link" />
     <origin xyz="0.0 ${wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" />
   </joint>
 
-  <link name="${prefix}ee_fixed_link" />
+  <link name="${prefix}ee_link" />
 
 
   <link name="${prefix}gripper_link">
@@ -305,7 +305,7 @@ center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 
     </collision>
   </link>
   <joint name="${prefix}ee_link_gripper" type="fixed">
-    <parent link="${prefix}ee_fixed_link"/>
+    <parent link="${prefix}ee_link"/>
     <child link="${prefix}gripper_link"/>
     <origin rpy="${pi/2} ${pi/2} ${pi/2}" xyz="0.05 0 0"/>
   </joint>

@@ -7,14 +7,14 @@
 
   
   <!-- <xacro:include filename="$(find ur5_robotiq_description)/src/urdf/robotiq.urdf.xacro" /> -->
-  <xacro:robotiq_c_model root_link="ee_fixed_link" show_underactuated="false" gravity="false"></xacro:robotiq_c_model>
+  <xacro:robotiq_c_model root_link="ee_link" show_underactuated="false" gravity="false"></xacro:robotiq_c_model>
 
   <!--
   <xacro:include filename="$(find ur5_robotiq_description)/src/urdf/s_model/s-model_articulated_macro.xacro"/>
   <xacro:s-model_articulated prefix=""></xacro:s-model_articulated>
 
   <joint name="s_model_to_arm" type="fixed">
-    <parent link="ee_fixed_link"/>
+    <parent link="ee_link"/>
     <child link="palm"/>
     <origin rpy="0.0 0.0 0.0" xyz="0.0 0.1363 0.0"/>
   </joint>
