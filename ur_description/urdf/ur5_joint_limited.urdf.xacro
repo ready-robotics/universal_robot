@@ -255,28 +255,28 @@ center_of_mass = [ [0, -0.02561, 0.00193], [0.2125, 0, 0.11336], [0.11993, 0.0, 
         <cylinder length="0.09" radius="0.065"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <material name="white"/>
+      <material name="White"/>
     </visual>
     <visual>
       <geometry>
         <box size="0.15 0.02 0.04"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0.065"/>
-      <material name="blue"/>
+      <material name="LightGrey"/>
     </visual>
     <visual>
       <geometry>
         <box size="0.03 0.02 0.05"/>
       </geometry>
       <origin rpy="0 0 0" xyz="-0.06 0 0.11"/>
-      <material name="white"/>
+      <material name="White"/>
     </visual>
     <visual>
       <geometry>
         <box size="0.03 0.02 0.05"/>
       </geometry>
       <origin rpy="0 0 0" xyz="0.06 0 0.11"/>
-      <material name="white"/>
+      <material name="White"/>
     </visual>
 
     <collision>
