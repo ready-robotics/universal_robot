@@ -3,8 +3,16 @@
 #  kinematics_solver_search_resolution: 0.005
 #  kinematics_solver_timeout: 0.005
 #  kinematics_solver_attempts: 3
+#manipulator:
+#  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+#  kinematics_solver_search_resolution: 0.005
+#  kinematics_solver_timeout: 0.005
+#  kinematics_solver_attempts: 3
 manipulator:
-  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
-  kinematics_solver_search_resolution: 0.005
-  kinematics_solver_timeout: 0.005
-  kinematics_solver_attempts: 3
+   kinematics_solver: trac_ik_kinematics_plugin/TRAC_IKKinematicsPlugin
+   kinematics_solver_timeout: 0.005
+   kinematics_solver_type: Distance #Returns first solution
+   # Other types:
+   # Distance: Runs until timeout, returns solution that minimizes SSE from the seed
+   # Manip 1: Runs until timeout, returns solution that maximizes sqrt(det(J*J^T))
+   # Manip 2: Runs until timeout, returns solution that minimizes cond(J) = |J||J^-1|

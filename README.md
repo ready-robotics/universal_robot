@@ -3,6 +3,7 @@ universal_robot
 
 This repository provides ROS support for the universal robots.  This repo holds source code for all versions > groovy.  For those versions <= groovy see: hg https://kforge.ros.org/ros_industrial/universal_robot
 
+Note: the IK solver in the kinematics.yaml has been changed from KDL to TRAC_IK. One should do `sudo apt-get install ros-indigo-trac-*` to install all the depedencies.
 
 __Installation from Source__  
 There are releases available for ROS Hydro and ROS Indigo. However, for the latest features and developments you might want to install from source.
