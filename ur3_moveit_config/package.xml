@@ -21,8 +21,10 @@
   <run_depend>joint_state_publisher</run_depend>
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>xacro</run_depend>
-  <build_depend>ur_description</build_depend>
   <run_depend>ur_description</run_depend>
+  <run_depend>trac_ik_kinematics_plugin</run_depend>
+  <run_depend>trac_ik_lib</run_depend>
+  <build_depend>ur_description</build_depend>
 
 
   <buildtool_depend>catkin</buildtool_depend>
