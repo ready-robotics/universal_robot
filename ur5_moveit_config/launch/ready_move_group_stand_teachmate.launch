@@ -37,6 +37,7 @@
 
   <!-- Sensors Functionality -->
   <include ns="move_group" file="$(find ur5_moveit_config)/launch/sensor_manager.launch.xml" if="$(arg allow_trajectory_execution)">
+    <!-- Use the same sensor manager with ur5 for now -->
     <arg name="moveit_sensor_manager" value="ur5" /> 
   </include>
 
