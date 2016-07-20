@@ -1,0 +1,33 @@
+<launch>
+  <!-- By default we do not overwrite the URDF. Change the following to true to change the default behavior -->
+  <!-- changed to True for collision debugging -->
+  <arg name="load_robot_description" default="False"/>
+  <arg name="limited" default="true"/>
+
+  <!-- The name of the parameter under which the URDF is loaded -->
+  <arg name="robot_description" default="robot_description"/>
+
+  <!-- Load universal robot description format (URDF) -->
+  <group if="$(arg load_robot_description)">
+    <param unless="$(arg limited)" name="$(arg robot_description)" command="$(find xacro)/xacro.py '$(find ready_motion_planning_description)/urdf/ur5_robot_cart_teachmate.urdf.xacro'" />
+    <!-- param if="$(arg limited)" name="$(arg robot_description)" textfile="/home/qianli/.costar/temp.urdf" /-->
+    <param if="$(arg limited)" name="$(arg robot_description)" command="$(find xacro)/xacro.py '$(find ready_motion_planning_description)/urdf/ur5_joint_limited_robot_cart_teachmate.urdf.xacro'" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+  </group>
+
+  <!-- The semantic description that corresponds to the URDF -->
+  <!-- This is rosparam set in ready_attachment_manager -->
+  <!-- param name="$(arg robot_description)_semantic" textfile="$/home/qianli/.costar/ur5_cart_teachmate_gripper_temp.srdf" /-->
+  
+  <!-- Load updated joint limits (override information from URDF) -->
+  <group ns="$(arg robot_description)_planning">
+    <rosparam command="load" file="$(find ur5_moveit_config)/config/joint_limits.yaml"/>
+  </group>
+
+  <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
+  <group ns="$(arg robot_description)_kinematics">
+    <rosparam command="load" file="$(find ur5_moveit_config)/config/kinematics.yaml"/>
+  </group>
+  
+</launch>
