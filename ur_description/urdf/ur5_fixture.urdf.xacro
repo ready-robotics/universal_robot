@@ -153,6 +153,9 @@
                   <!-- CAD measured -->
                   <cylinder radius="0.023" length="0.07"/>
               </geometry>
+              <material name="FixtureColor">
+                  <color rgba="0.2 0.2 1 1"/>
+              </material>
           </visual>
           <collision>
               <origin xyz="0 -0.093 0.025 " rpy="1.5707963 0 0"/>
@@ -160,6 +163,9 @@
                   <!-- CAD measured -->
                   <cylinder radius="0.023" length="0.07"/>
               </geometry>
+              <material name="White">
+                  <color rgba="1 1 1 1"/>
+              </material>
           </collision>
       </link>
 
@@ -210,6 +216,9 @@
                   <!-- CAD measured -->
                   <cylinder radius="0.023" length="0.07"/>
               </geometry>
+              <material name="FixtureColor">
+                  <color rgba="0.2 0.2 1 1"/>
+              </material>
           </visual>
           <collision>
               <origin xyz="0 0.025 0.518" rpy="0 0 0"/>
@@ -292,30 +301,7 @@
           </xacro:if>
           <dynamics damping="0.0" friction="0.0"/>
       </joint>
-      
-       <link name="${prefix}fixture_3_link">
-          <visual>
-              <origin xyz="-0.06278 -0.026 -0.03625" rpy="0 1.04719 0"/>
-              <geometry>
-                  <!-- CAD measured -->
-                  <cylinder radius="0.023" length="0.07"/>
-              </geometry>
-          </visual>
-          <collision>
-              <origin xyz="-0.06278 -0.026 -0.03625" rpy="0 1.04719 0"/>
-              <geometry>
-                  <!-- CAD measured -->
-                  <cylinder radius="0.023" length="0.07"/>
-              </geometry>
-          </collision>
-      </link>
 
-      <joint name="${prefix}wrist_1_fixture_joint" type="fixed">
-          <parent link="${prefix}wrist_1_link" />
-          <child link = "${prefix}fixture_3_link" />
-          <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-          <axis xyz="0 0 1" />
-      </joint>
 
       <link name="${prefix}wrist_2_link">
           <visual>
@@ -375,6 +361,39 @@
           <origin xyz="0.0 ${wrist_3_length} 0.0" rpy="0.0 0.0 ${pi/2.0}" />
       </joint>
 
+      <link name="${prefix}fixture_3_link">
+          <visual>
+              <!-- origin xyz="-0.03625  -0.026 0.06278" rpy="0 -0.52359 0"/-->
+              <origin xyz="-0.03625  -0.026 0.15578" rpy="0 -0.52359 0"/>
+              <geometry>
+                  <!-- CAD measured -->
+                  <cylinder radius="0.023" length="0.07"/>
+              </geometry>
+              <material name="FixtureColor">
+                  <color rgba="0.2 0.2 1 1"/>
+              </material>
+          </visual>
+          <collision>
+              <origin xyz="-0.03625  -0.026 0.15578" rpy="0 -0.52359 0"/>
+              <geometry>
+                  <!-- CAD measured -->
+                  <cylinder radius="0.023" length="0.07"/>
+              </geometry>
+              <material name="White">
+                  <color rgba="1 1 1 1"/>
+              </material>
+
+          </collision>
+      </link>
+
+      <joint name="${prefix}wrist_2_fixture_joint" type="fixed">
+          <parent link="${prefix}wrist_2_link" />
+          <child link = "${prefix}fixture_3_link" />
+          <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+          <axis xyz="0 0 1" />
+      </joint>
+
+
       <link name="${prefix}ee_link">
           <collision>
               <geometry>
@@ -392,20 +411,19 @@
       <joint name="${prefix}base_link-base_fixed_joint" type="fixed">
           <!-- NOTE: this rotation is only needed as long as base_link itself is
                  not corrected wrt the real robot (ie: rotated over 180
-                 degrees)
-      -->
-      <origin xyz="0 0 0" rpy="0 0 ${-pi}"/>
-      <parent link="${prefix}base_link"/>
-      <child link="${prefix}base"/>
-  </joint>
+                 degrees)-->
+        <origin xyz="0 0 0" rpy="0 0 ${-pi}"/>
+        <parent link="${prefix}base_link"/>
+        <child link="${prefix}base"/>
+    </joint>
 
-  <!-- Frame coincident with all-zeros TCP on UR controller -->
-  <link name="${prefix}tool0"/>
-  <joint name="${prefix}wrist_3_link-tool0_fixed_joint" type="fixed">
-      <origin xyz="0 ${wrist_3_length} 0" rpy="${pi/-2.0} 0 0"/>
-      <parent link="${prefix}wrist_3_link"/>
-      <child link="${prefix}tool0"/>
-  </joint>
+    <!-- Frame coincident with all-zeros TCP on UR controller -->
+    <link name="${prefix}tool0"/>
+    <joint name="${prefix}wrist_3_link-tool0_fixed_joint" type="fixed">
+        <origin xyz="0 ${wrist_3_length} 0" rpy="${pi/-2.0} 0 0"/>
+        <parent link="${prefix}wrist_3_link"/>
+        <child link="${prefix}tool0"/>
+    </joint>
 
-  </xacro:macro>
+</xacro:macro>
 </robot>
