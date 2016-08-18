@@ -1,8 +1,10 @@
 <launch>
   <arg name="limited" default="true"/>
+  <arg name="joint_range_4pi" default="true"/>
 
   <include file="$(find ur5_moveit_config)/launch/planning_context_stand_teachmate.launch">
     <arg name="limited" value="$(arg limited)" />
+    <arg name="joint_range_4pi" value="$(arg joint_range_4pi)" />
   </include>
 
   <!-- GDB Debug Option -->

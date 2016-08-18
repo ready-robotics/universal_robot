@@ -3,7 +3,8 @@
   <arg name="limited" default="true"/>
   <arg name="debug" default="false" />
   <arg name="enable_reconfig" default="false"/>
-    
+  <arg name="joint_range_4pi" default="true"/>
+
   <!-- Remap follow_joint_trajectory -->
   <remap if="$(arg sim)" from="/follow_joint_trajectory" to="/arm_controller/follow_joint_trajectory"/>
   
@@ -11,6 +12,7 @@
   <include file="$(find ur5_moveit_config)/launch/ready_move_group_stand_teachmate.launch">
     <arg name="limited" default="$(arg limited)"/>
     <arg name="debug" default="$(arg debug)" />
+    <arg name="joint_range_4pi" value="$(arg joint_range_4pi)"/>
   </include>
 
   <!-- Launch manipulability server -->
