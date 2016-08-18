@@ -2,6 +2,7 @@
   <arg name="sim" default="false" />
   <arg name="limited" default="true"/>
   <arg name="debug" default="false" />
+  <arg name="enable_reconfig" default="false"/>
     
   <!-- Remap follow_joint_trajectory -->
   <remap if="$(arg sim)" from="/follow_joint_trajectory" to="/arm_controller/follow_joint_trajectory"/>
@@ -11,4 +12,11 @@
     <arg name="limited" default="$(arg limited)"/>
     <arg name="debug" default="$(arg debug)" />
   </include>
+
+  <!-- Launch manipulability server -->
+  <include file="$(find ready_motion_planning)/launch/manipulability.launch"/>
+
+  <!-- Launch motion planning reconfig -->
+  <include if="$(arg enable_reconfig)" file="$(find ready_motion_planning)/launch/motion_planning_reconfig.launch"/>
+
 </launch>
