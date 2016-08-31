@@ -25,7 +25,7 @@
   <run_depend>trac_ik_kinematics_plugin</run_depend>
   <run_depend>trac_ik_lib</run_depend>
   <build_depend>ur_description</build_depend>
-
+  <build_depend>convex_decomposition</build_depend>
 
   <buildtool_depend>catkin</buildtool_depend>
   

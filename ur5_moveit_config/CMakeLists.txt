@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ur5_moveit_config)
 
 find_package(catkin REQUIRED COMPONENTS
-    ready_motion_planning
-    )
+  ready_motion_planning
+  convex_decomposition
+)
 
 catkin_package()
 
