@@ -1,6 +1,6 @@
 <package>
   <name>universal_robot</name>
-  <version>0.4.0</version>
+  <version>0.4.2</version>
   <description>
       Drivers, description, and utilities for Universal Robot Arms.
   </description>
@@ -21,12 +21,7 @@
   <run_depend>ur3_moveit_config</run_depend>
   <run_depend>ur5_moveit_config</run_depend>
   <run_depend>ur10_moveit_config</run_depend>
-  <run_depend>ur_bringup</run_depend>
   <run_depend>ur_description</run_depend>
-  <run_depend>ur_driver</run_depend>
-  <run_depend>ur_gazebo</run_depend>
-  <run_depend>ur_kinematics</run_depend>
-  <run_depend>ur_msgs</run_depend>
 
   <export>
     <metapackage/>
