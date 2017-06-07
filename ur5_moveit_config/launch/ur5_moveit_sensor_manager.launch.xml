@@ -9,7 +9,7 @@
 
     <!-- Params are specific to this plugin -->
 
-    <arg name="head_pointing_frame" default="/base_link" />
+    <arg name="head_pointing_frame" default="base_link" />
     <param name="head_pointing_frame" value="$(arg head_pointing_frame)" />
 
     <!-- Params for the octomap monitor -->

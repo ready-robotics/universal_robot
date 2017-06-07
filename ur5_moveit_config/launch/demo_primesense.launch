@@ -18,7 +18,7 @@
 
   <!-- Connect to PrimeSense -->
   <include file="$(find openni2_launch)/launch/openni2.launch" />
-  <node pkg="tf" type="static_transform_publisher" name="robot_camera_broadcaster" args="0 0 0 0 0 0 /base_link /camera_link 100" /> 
+  <node pkg="tf" type="static_transform_publisher" name="robot_camera_broadcaster" args="0 0 0 0 0 0 base_link camera_link 100" />
 
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">

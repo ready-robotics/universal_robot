@@ -11,10 +11,10 @@
   <!-- arm -->
   <xacro:ur3_robot prefix="" joint_limited="false"/>
 
-  <link name="world" />
+  <link name="stand" />
 
   <joint name="world_joint" type="fixed">
-    <parent link="world" />
+    <parent link="stand" />
     <child link = "base_link" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
   </joint>
