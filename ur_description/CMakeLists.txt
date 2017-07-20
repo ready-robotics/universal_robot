@@ -130,3 +130,20 @@ install(DIRECTORY meshes DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+# Bake assets for this package.
+find_package(catkin REQUIRED COMPONENTS cerberus)
+
+function(bake_robot_arm model)
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/base.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/base.mesh")
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/forearm.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/forearm.mesh")
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/shoulder.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/shoulder.mesh")
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/upperarm.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/upperarm.mesh")
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/wrist1.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/wrist1.mesh")
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/wrist2.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/wrist2.mesh")
+execute_process(COMMAND ${cerberus_ASSET_COMPILER} "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/wrist3.dae" "${CMAKE_SOURCE_DIR}/meshes/${model}/visual/wrist3.mesh")
+endfunction(bake_robot_arm)
+
+bake_robot_arm(ur3)
+bake_robot_arm(ur5)
+bake_robot_arm(ur10)
