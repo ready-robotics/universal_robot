@@ -2,8 +2,8 @@
 <launch>
   <arg name="limited" default="true"/>
   
-  <param unless="$(arg limited)" name="robot_description" command="$(find xacro)/xacro.py '$(find ready_motion_planning_description)/urdf/ur5_robot_cart_teachmate.urdf.xacro'" />
-  <param if="$(arg limited)" name="robot_description" command="$(find xacro)/xacro.py '$(find ready_motion_planning_description)/urdf/ur5_joint_limited_robot_cart_teachmate.urdf.xacro'" />
+  <param unless="$(arg limited)" name="robot_description" command="$(find xacro)/xacro.py '$(find motion_planning_description)/urdf/ur5_robot_cart_teachmate.urdf.xacro'" />
+  <param if="$(arg limited)" name="robot_description" command="$(find xacro)/xacro.py '$(find motion_planning_description)/urdf/ur5_joint_limited_robot_cart_teachmate.urdf.xacro'" />
 
   <node name = "robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
