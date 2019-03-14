@@ -47,12 +47,12 @@
   q_home_offset = [0, -1.570796327, 0, -1.570796327, 0, 0]
   joint_direction = [1, 1, -1, 1, 1, 1]
   -->
-  <property name="ur5_a2" value="-0.42500" />
-  <property name="ur5_a3" value="-0.39220" />
-  <property name="ur5_d1" value="0.1625" />
-  <property name="ur5_d4" value="0.1333" />
-  <property name="ur5_d5" value="0.09970" />
-  <property name="ur5_d6" value="0.0996" />
+  <property name="ur5e_a2" value="-0.42500" />
+  <property name="ur5e_a3" value="-0.39220" />
+  <property name="ur5e_d1" value="0.1625" />
+  <property name="ur5e_d4" value="0.1333" />
+  <property name="ur5e_d5" value="0.09970" />
+  <property name="ur5e_d6" value="0.0996" />
 
   <!-- Properties from urcontrol.conf.UR5 e-series -->
   <!--
@@ -75,12 +75,12 @@
   <property name="elbow_offset" value="0.093" />
 
   <!-- Link lengths used in model -->
-  <property name="shoulder_height" value="${ur5_d1}" />
-  <property name="upper_arm_length" value="${-ur5_a2}" />
-  <property name="forearm_length" value="${-ur5_a3}" />
-  <property name="wrist_1_length" value="${ur5_d4 - elbow_offset - shoulder_offset}" />
-  <property name="wrist_2_length" value="${ur5_d5}" />
-  <property name="wrist_3_length" value="${ur5_d6}" />
+  <property name="shoulder_height" value="${ur5e_d1}" />
+  <property name="upper_arm_length" value="${-ur5e_a2}" />
+  <property name="forearm_length" value="${-ur5e_a3}" />
+  <property name="wrist_1_length" value="${ur5e_d4 - elbow_offset - shoulder_offset}" />
+  <property name="wrist_2_length" value="${ur5e_d5}" />
+  <property name="wrist_3_length" value="${ur5e_d6}" />
 
   <xacro:macro name="cylinder_inertial" params="radius length mass *origin">
     <inertial>
@@ -93,11 +93,11 @@
   </xacro:macro>
 
 
-  <xacro:macro name="ur5_robot" params="prefix joint_limited">
+  <xacro:macro name="ur5e_robot" params="prefix joint_limited">
     <link name="${prefix}base_link" >
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/base.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/base.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -105,7 +105,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/base.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/base.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.06" length="0.05" mass="${base_mass}">
@@ -130,7 +130,7 @@
     <link name="${prefix}shoulder_link">
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/shoulder.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/shoulder.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -138,7 +138,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/shoulder.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/shoulder.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.06" length="0.15" mass="${shoulder_mass}">
@@ -163,7 +163,7 @@
     <link name="${prefix}upper_arm_link">
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/upperarm.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/upperarm.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -171,7 +171,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/upperarm.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/upperarm.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.06" length="0.56" mass="${upper_arm_mass}">
@@ -196,7 +196,7 @@
     <link name="${prefix}forearm_link">
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/forearm.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/forearm.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -204,7 +204,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/forearm.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/forearm.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.06" length="0.5" mass="${forearm_mass}">
@@ -229,7 +229,7 @@
     <link name="${prefix}wrist_1_link">
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/wrist1.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/wrist1.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -237,7 +237,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/wrist1.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/wrist1.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.6" length="0.12" mass="${wrist_1_mass}">
@@ -262,7 +262,7 @@
     <link name="${prefix}wrist_2_link">
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/wrist2.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/wrist2.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -270,7 +270,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/wrist2.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/wrist2.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.6" length="0.12" mass="${wrist_2_mass}">
@@ -295,7 +295,7 @@
     <link name="${prefix}wrist_3_link">
       <visual>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/visual/wrist3.dae" />
+          <mesh filename="package://ur_description/meshes/ur5e/visual/wrist3.dae" />
         </geometry>
         <material name="LightGrey">
           <color rgba="0.7 0.7 0.7 1.0"/>
@@ -303,7 +303,7 @@
       </visual>
       <collision>
         <geometry>
-          <mesh filename="package://ur_description/meshes/ur5/collision/wrist3.stl" />
+          <mesh filename="package://ur_description/meshes/ur5e/collision/wrist3.stl" />
         </geometry>
       </collision>
       <xacro:cylinder_inertial radius="0.6" length="0.12" mass="${wrist_3_mass}">
