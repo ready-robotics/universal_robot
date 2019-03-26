@@ -147,3 +147,7 @@ endfunction(bake_robot_arm)
 bake_robot_arm(ur3)
 bake_robot_arm(ur5)
 bake_robot_arm(ur10)
+
+bake_robot_arm(ur3e)
+bake_robot_arm(ur5e)
+bake_robot_arm(ur10e)
