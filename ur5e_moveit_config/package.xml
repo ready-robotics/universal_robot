@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ur5e_moveit_config</name>
+  <version>2.0.0</version>
+  <description>
+     A package containing MoveIt related configurations and utilities for the UR5e
+  </description>
+  <author email="josh@ready-robotics.com">Joshua Davis</author>
+  <maintainer email="josh@ready-robotics.com">Joshua Davis</maintainer>
+
+  <license>PROPRIETARY</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>moveit_plugins</exec_depend>
+  <exec_depend>trac_ik_kinematics_plugin</exec_depend>
+  <exec_depend>trac_ik_lib</exec_depend>
+
+  <export></export>
+</package>
