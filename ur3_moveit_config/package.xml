@@ -1,31 +1,19 @@
-<package>
-
+<?xml version="1.0"?>
+<package format="2">
   <name>ur3_moveit_config</name>
   <version>2.0.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the ur3 with the MoveIt Motion Planning Framework
+     A package containing MoveIt related configurations and utilities for the UR3
   </description>
   <author email="fxm@ipa.fhg.de">Felix Messmer</author>
-  <maintainer email="fxm@ipa.fhg.de">Felix Messmer</maintainer>
-  
+  <maintainer email="josh@ready-robotics.com">Joshua Davis</maintainer>
+
   <license>BSD</license>
 
-  <url type="website">http://moveit.ros.org/</url>
-  <url type="bugtracker">https://github.com/ros-planning/moveit_setup_assistant/issues</url>
-  <url type="repository">https://github.com/ros-planning/moveit_setup_assistant</url>
-
-  <run_depend>moveit_ros_move_group</run_depend>
-  <run_depend>moveit_planners_ompl</run_depend>
-  <run_depend>moveit_ros_visualization</run_depend>
-  <run_depend>moveit_plugins</run_depend>
-  <run_depend>joint_state_publisher</run_depend>
-  <run_depend>robot_state_publisher</run_depend>
-  <run_depend>xacro</run_depend>
-  <run_depend>ur_description</run_depend>
-  <run_depend>trac_ik_kinematics_plugin</run_depend>
-  <run_depend>trac_ik_lib</run_depend>
-  <build_depend>ur_description</build_depend>
-  <build_depend>convex_decomposition</build_depend>
   <buildtool_depend>catkin</buildtool_depend>
-  
+  <exec_depend>moveit_plugins</exec_depend>
+  <exec_depend>trac_ik_kinematics_plugin</exec_depend>
+  <exec_depend>trac_ik_lib</exec_depend>
+
+  <export></export>
 </package>
