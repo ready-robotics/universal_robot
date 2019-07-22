@@ -71,7 +71,7 @@
   <xacro:macro name="ur3e_robot" params="prefix joint_limited">
     <link name="${prefix}base_link" >
       <visual>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${rotational_offset}" />
+        <origin xyz="0.0 0.0 0.0" rpy="${pi/2.0} 0.0 ${rotational_offset}" />
         <geometry>
           <mesh filename="package://ur_description/meshes/ur3e/visual/base.dae"/>
         </geometry>
@@ -80,7 +80,7 @@
         </material>
       </visual>
       <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${rotational_offset}" />
+        <origin xyz="0.0 0.0 0.0" rpy="${pi/2.0} 0.0 ${rotational_offset}" />
         <geometry>
           <mesh filename="package://ur_description/meshes/ur3e/collision/base.dae"/>
         </geometry>
