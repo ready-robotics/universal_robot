@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>ur5e_moveit_config</name>
-  <version>2.3.0</version>
+  <version>2.3.4</version>
   <description>
      A package containing MoveIt related configurations and utilities for the UR5e
   </description>
