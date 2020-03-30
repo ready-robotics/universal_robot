@@ -324,8 +324,8 @@
                  degrees)
       -->
       <origin xyz="0 0 0" rpy="0 0 ${-pi}"/>
-      <parent link="${prefix}base_link"/>
-      <child link="${prefix}base"/>
+      <parent link="${prefix}base"/>
+      <child link="${prefix}base_link"/>
     </joint>
 
     <!-- Frame coincident with all-zeros TCP on UR controller -->

@@ -424,9 +424,10 @@
           <!-- NOTE: this rotation is only needed as long as base_link itself is
                  not corrected wrt the real robot (ie: rotated over 180
                  degrees)-->
-        <origin xyz="0 0 0" rpy="0 0 ${-pi}"/>
-        <parent link="${prefix}base_link"/>
-        <child link="${prefix}base"/>
+        <origin xyz="0 0 0" rpy="0 0 -${pi}"/>
+        <parent link="${prefix}base"/>
+        <child link="${prefix}base_link"/>
+
     </joint>
 
     <!-- Frame coincident with all-zeros TCP on UR controller -->
