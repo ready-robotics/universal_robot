@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>ur10_moveit_config</name>
-  <version>3.0.2</version>
+  <version>3.0.3</version>
   <description>
      A package containing MoveIt related configurations and utilities for the UR10
   </description>
